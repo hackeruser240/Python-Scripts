@@ -1,8 +1,0 @@
-0 (Main): An E-4B in flight
-1: An E-4 advanced airborne command post (AABNCP) on thenuclear electromagnetic pulse(EMP) simulator for testing.
-2: An E-4B approaching aKC-10 ExtenderofTravis AFBin preparation foraerial refueling
-3: National Emergency Airborne Command Post internal configuration, April 1976
-4: An E-4 atEl Dorado International AirportinBogotá,Colombia
-5: An E-4B and twoC-32satDefence Establishment Fairbairn,Canberra, Australia during bilateral defense talks, February 2008
-6: An E-4 on landing approach atTinker AFB.
-7: An E-4B during takeoff
