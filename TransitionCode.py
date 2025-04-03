@@ -1,5 +1,6 @@
 import os 
 import argparse as ag
+import sys 
 
 parser=ag.ArgumentParser(description="This is the transition folder code")
 parser.add_argument("--parentPath", required=True, help="Enter the path!")
@@ -27,8 +28,10 @@ def renamingFolderinTransitionFolder(old_path,transition_path,newlist,count):
         os.rename(old_path,new_path)
         print(f"Renamed '{old_path}' to '{new_path}' ")
     except:
-        print("Issue in 'renamingFolderinTransitionFolder' ")
-
+        print("Issue in 'renamingFolderinTransitionFolder': ")
+        print(f"cannot rename '{old_path}' to '{new_path}' ")
+        print("Breaking the loop.")
+        sys.exit()
 
 def renamingFolderinParentPath(fullpath,parentPath,newlist,count):
     #print(old_path)
@@ -51,6 +54,7 @@ def findingFolderNames(path):
             number.append(int(folder))
     number.sort()
     return number
+
 def firstTwoCases(path,number):
     number.sort()
     if number[0]!=0: 
@@ -131,8 +135,17 @@ def checkingEmptyFolder(path):
 def entriesCheckinTP(numoffoldersinparentFolder,mylist):
     
     mylist.sort()
+    
+    '''
+    before 03-apr-25:
     expected = set(range(numoffoldersinparentFolder[-1],len(numoffoldersintransFolder)+numoffoldersinparentFolder[-1]+1 ))
-    actual=set(numoffoldersintransFolder)  
+    actual=set(numoffoldersintransFolder)
+    '''
+    
+    #after 03-apr-25:
+    expected = set(range(numoffoldersinparentFolder[-1],len(mylist)+numoffoldersinparentFolder[-1]+1 ))
+    actual=set(mylist)
+
     missing_numbers = expected - actual  # Find missing numbers
     
     if not missing_numbers:
@@ -141,6 +154,133 @@ def entriesCheckinTP(numoffoldersinparentFolder,mylist):
     else:
         #print(f"Missing folders: {sorted(missing_numbers)}")
         return sorted(missing_numbers)
+    
+def processingParentPath(parentPath):
+    print("="*20,"Processing Parent Path","="*20)
+    print(f"Detecting missing folders and renaming them in {parentPath}")
+
+    #Checking for any empty folders and deleting them
+    checkingEmptyFolder(parentPath)
+
+    #Finding current folder names in parentPath
+    number=findingFolderNames(parentPath)
+    print("Existing folder names: ",number)
+
+    #Checking if all the folders in parentPath are consistent or not
+    result=entriesCheck(number)
+    if result==True:
+        print(f"All entries are in order from {number[0]} to {number[-1]}!")
+    else:
+        print(f"Missing folders in the Parent path: {result}")
+        
+        #Generating a new/proposed list for the folders in parent path
+        newlist=[]
+        for i in range(0,len(number)):
+            newlist.append(i)
+        print("Proposed new (folder) names:",newlist)
+        
+        #Special cases for the first and second folder!
+        firstTwoCases(parentPath,number)
+        
+        for count,folder_number in enumerate(number):
+            fullpath=os.path.join(parentPath,f"{folder_number}")
+            if folder_number==0 or folder_number==1:        
+                #this is because both of these cases have been dealt above
+                pass
+            if count<len(newlist)-1:
+                renamingFolderinParentPath(fullpath,parentPath,newlist,count)
+            elif count==len(newlist)-1: 
+                renamingFolderinParentPath(fullpath,parentPath,newlist,count)
+        
+        print(f"Folders have been successfully processed in '{parentPath}' ")
+
+def processingTransitionPath(transition_path):
+    print("="*20,"Processing Transition Folder","="*20)
+    print(f"Detecting missing folders and renaming them in {transition_path}")
+
+    #Checking for any empty folders and deleting them!
+    checkingEmptyFolder(parentPath)
+
+    #number=[]
+    numoffoldersinparentFolder=[]
+    numoffoldersintransFolder=[]
+
+    #finding the number of folders in the parent folder
+    numoffoldersinparentFolder=findingFolderNames(parentPath)
+
+    #finding the number of folders in the transition folder
+    numoffoldersintransFolder=findingFolderNames(transition_path)
+
+    numoffoldersinparentFolder.sort()
+    numoffoldersintransFolder.sort()
+
+    print(f"Total folder(s) in {parentPath}: {len(numoffoldersinparentFolder)}")
+    print(f"Total folder(s) in {transition_path}: {len(numoffoldersintransFolder)}")
+
+
+    if numoffoldersintransFolder == []:
+        print("Transition folder is empty!")
+
+    else:
+        print(f"Existing names in {transition_path}:",numoffoldersintransFolder)
+        result=entriesCheckinTP(numoffoldersinparentFolder,numoffoldersintransFolder)
+        
+        if result==True:
+            print(f"All entries are in order from {numoffoldersintransFolder[0]} to {numoffoldersintransFolder[-1]}!")
+        else:
+            #print(f"Missing folders in the Transition path: {result}")
+            
+            #==========================Intermediate List==========================
+            def intermediateList():
+                newlist=[]
+                for i in range( numoffoldersintransFolder[-1]+1 , (len(numoffoldersintransFolder)+numoffoldersintransFolder[-1]+1) ):
+                    newlist.append(i)
+                
+                print(f"Proposed Intermediate names: {newlist}")
+                
+                print("Giving new Intermeidate folder names..")
+                
+                for count,folder in enumerate(numoffoldersintransFolder):
+                    old_path=os.path.join(transition_path,f"{folder}")
+                    if os.path.isdir(old_path) and count<len(newlist)-1:
+                        renamingFolderinTransitionFolder(old_path,transition_path,newlist,count)    
+                    elif os.path.isdir(old_path) and count==len(newlist)-1:
+                        renamingFolderinTransitionFolder(old_path,transition_path,newlist,count)
+                        print(f"Done renaming Intermediate folder(s) in {transition_path}")
+
+            intermediateList()
+            
+            #==========================Final List==========================
+            
+            def finalList():
+                #finding the number of folders in the transition folder
+                numoffoldersintransFolder=findingFolderNames(transition_path)
+
+                newlist=[]
+                for i in range(len(numoffoldersinparentFolder),len(numoffoldersinparentFolder)+len(numoffoldersintransFolder)):
+                    newlist.append(i)
+                
+                print(f"Proposed Final (folder) names: {newlist}")
+                print(f"Total folder names: {len(newlist)}")
+
+                print("Giving new Final folder names..")
+            
+                for count,folder in enumerate(numoffoldersintransFolder):
+                    old_path=os.path.join(transition_path,f"{folder}")
+                    print(f"old_path:{old_path}")
+                    print(f"count:{count}")
+                    
+                    if os.path.isdir(old_path) and count<len(newlist)-1:
+                        renamingFolderinTransitionFolder(old_path,transition_path,newlist,count)
+                        print("here1")    
+                    elif os.path.isdir(old_path) and count==len(newlist)-1:
+                        renamingFolderinTransitionFolder(old_path,transition_path,newlist,count)
+                        print("here2")         
+                        print(f"Done renaming Final folder(s) in {transition_path}")
+
+            finalList()
+            movingTransitionPathFolders(transition_path,parentPath)
+
 #==================================Getting Inputs==================================
 
 #parentPath=r"E:\Images\0Z"
@@ -149,96 +289,7 @@ transition_path=os.path.join(parentPath,'Inter')
 
 #==================================Processing Parent Path==================================
 
-print("="*20,"Processing Parent Path","="*20)
-print(f"Detecting missing folders and renaming them in {parentPath}")
-
-#Checking for any empty folders and deleting them
-checkingEmptyFolder(parentPath)
-
-#Finding current folder names in parentPath
-number=findingFolderNames(parentPath)
-print("Existing folder names: ",number)
-
-#Checking if all the folders in parentPath are consistent or not
-result=entriesCheck(number)
-if result==True:
-    print(f"All entries are in order from {number[0]} to {number[-1]}!")
-else:
-    print(f"Missing folders in the Parent path: {result}")
-    
-    #Generating a new/proposed list for the folders in parent path
-    newlist=[]
-    for i in range(0,len(number)):
-        newlist.append(i)
-    print("Proposed new (folder) names:",newlist)
-    
-    #Special cases for the first and second folder!
-    firstTwoCases(parentPath,number)
-    
-    for count,folder_number in enumerate(number):
-        fullpath=os.path.join(parentPath,f"{folder_number}")
-        if folder_number==0 or folder_number==1:        
-            #this is because both of these cases have been dealt above
-            pass
-        if count<len(newlist)-1:
-            renamingFolderinParentPath(fullpath,parentPath,newlist,count)
-        elif count==len(newlist)-1: 
-            renamingFolderinParentPath(fullpath,parentPath,newlist,count)
-    
-    print(f"Folders have been successfully processed in '{parentPath}' ")
+processingParentPath(parentPath)
 
 #==================================Processing Transition Path==================================
-
-print("="*20,"Processing Transition Folder","="*20)
-print(f"Detecting missing folders and renaming them in {transition_path}")
-
-#Checking for any empty folders and deleting them!
-checkingEmptyFolder(parentPath)
-
-#number=[]
-numoffoldersinparentFolder=[]
-numoffoldersintransFolder=[]
-
-#finding the number of folders in the parent folder
-numoffoldersinparentFolder=findingFolderNames(parentPath)
-
-#finding the number of folders in the transition folder
-numoffoldersintransFolder=findingFolderNames(transition_path)
-
-numoffoldersinparentFolder.sort()
-numoffoldersintransFolder.sort()
-
-print(f"Total folder(s) in {parentPath}: {len(numoffoldersinparentFolder)}")
-print(f"Total folder(s) in {transition_path}: {len(numoffoldersintransFolder)}")
-
-
-if numoffoldersintransFolder == []:
-    print("Transition folder is empty!")
-
-else:
-    print(f"Existing names in {transition_path}:",numoffoldersintransFolder)
-    result=entriesCheckinTP(numoffoldersinparentFolder,numoffoldersintransFolder)
-    
-    if result==True:
-        print(f"All entries are in order from {numoffoldersintransFolder[0]} to {numoffoldersintransFolder[-1]}!")
-    else:
-        #print(f"Missing folders in the Transition path: {result}")
-        
-        newlist=[]
-        for i in range(len(numoffoldersinparentFolder),len(numoffoldersinparentFolder)+len(numoffoldersintransFolder)):
-            newlist.append(i)
-        
-        print(f"Proposed new (folder) names: {newlist}")
-        
-        print("Giving new folder names..")
-        
-        for count,folder in enumerate(numoffoldersintransFolder):
-            old_path=os.path.join(transition_path,f"{folder}")
-            if os.path.isdir(old_path) and count<len(newlist)-1:
-                renamingFolderinTransitionFolder(old_path,transition_path,newlist,count)    
-            elif os.path.isdir(old_path) and count==len(newlist)-1:
-                renamingFolderinTransitionFolder(old_path,transition_path,newlist,count)
-        
-        print(f"Done renaming folder(s) in {transition_path}")
-
-        movingTransitionPathFolders(transition_path,parentPath)
+processingTransitionPath(transition_path)
