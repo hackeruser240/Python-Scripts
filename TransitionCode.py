@@ -56,6 +56,9 @@ def findingFolderNames(path):
     return number
 
 def firstTwoCases(path,number):
+    '''
+    This function renames the first two folders in the parentPath to '0' and '1'.
+    '''
     number.sort()
     if number[0]!=0: 
         print("Folders do NOT begin with 0!")
