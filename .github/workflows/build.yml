@@ -16,7 +16,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9' # Or your python version
+          python-version: '3.12' # Or your python version
 
       - name: Install dependencies
         run: pip install pyinstaller
@@ -37,4 +37,11 @@ jobs:
           git config --global user.email "afaqahmad240@yahoo.com"
           git add dist/PDFdownloader.exe  # Path to your built .exe
           git commit -m "Add latest build"
-          git push "https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" 
+          git push "https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+
+      # Create a release
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/PDFdownloader.exe  # Path to your .exe
+          body: "Changelog: Initial release"  # Release notes
