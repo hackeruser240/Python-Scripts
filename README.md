@@ -1,7 +1,6 @@
 # Python-Scripts
 Everything Python scripts.
-
-%</i></i> 
+ 
 <ol>
   <li> CanadOneBusinessData.py: extracts business data from CanadaOne </i>completed</i> </li>
   <li> extractingPDFs.py: as the name suggests, extracts PDF from a given directory</li>
@@ -10,6 +9,4 @@ Everything Python scripts.
   <li> tableDownload: downloads table(s) from a wikipedia page</li>
   <li> transitionCode: code to adjust foldes froma 'inter' folder to your main folder with adjusting the names etc</li>
   <li> WordMacro: project that applies a defined macro to a list of MS Word files.</li>
-  <li> </li>
-
 </ol>
