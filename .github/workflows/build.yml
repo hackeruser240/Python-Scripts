@@ -2,8 +2,8 @@ name: Build EXE
 
 on:
   push:
-    branches:
-      - exe # or develop, or main depending on your workflow
+    branches: [ main ]  # or "v1" or any branch you want to trigger from
+  workflow_dispatch:
 
 jobs:
   build:
