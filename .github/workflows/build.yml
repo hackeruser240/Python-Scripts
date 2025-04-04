@@ -35,6 +35,6 @@ jobs:
         run: |
           git config --global user.name "hackeruser240"
           git config --global user.email "afaqahmad240@yahoo.com"
-          git add dist/testing.exe  # Path to your built .exe
+          git add dist/PDFdownloader.exe  # Path to your built .exe
           git commit -m "Add latest build"
           git push "https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" 
