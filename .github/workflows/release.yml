@@ -1,0 +1,18 @@
+name: Build and Release
+
+on:
+  push:
+    tags: ['v*']  # Trigger when tags like v1.0, v2.0 are pushed
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Create a release
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/PDFdownloader.exe  # Path to your .exe
+          body: "Changelog: Initial release"  # Release notes
