@@ -1,4 +1,6 @@
-# This script downloads tables from a wikipedia website
+'''
+This script downloads tables from a wikipedia website
+'''
 
 import pandas as pd 
 import argparse as ag

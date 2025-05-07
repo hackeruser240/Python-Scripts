@@ -1,3 +1,7 @@
+'''
+08-May-2025: Thursday
+This code was developed as an enhanced functionality of the main YelpDataExtractor script. For an updated version, go there. This has become obselete. 
+'''
 import os
 import shutil
 import argparse
