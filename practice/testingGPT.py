@@ -1,7 +1,7 @@
 from openai import OpenAI
 
 # 🔑 Paste your API key directly here
-client = OpenAI(api_key="put in the folder. find it in documents")  # <<< Replace this with your actual key
+#client = OpenAI(api_key="put in the folder. find it in documents")  # <<< Replace this with your actual key
 
 def main():
     print("🤖 ChatGPT CLI - type 'exit' to quit\n")
