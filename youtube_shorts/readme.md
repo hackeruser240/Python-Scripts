@@ -98,9 +98,3 @@ If you wish to change these paths, you'll need to directly edit the `file_path` 
 ## 🤝 Contributing
 
 Feel free to fork this repository, make improvements, and submit pull requests. For major changes, please open an issue first to discuss what you would like to change.
-
----
-
-## 📄 License
-
-This project is open-sourced under the MIT License. See the `LICENSE` file (if you choose to add one) for more details.
