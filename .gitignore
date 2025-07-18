@@ -1,2 +1,3 @@
 python-env/
-anconda_projects/
+anconda_projects/db/
+.ipynb_checkpoints/
