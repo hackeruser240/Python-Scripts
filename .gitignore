@@ -1,3 +1,5 @@
 python-env/
 anconda_projects/db/
 .ipynb_checkpoints/
+Python-workspace.code-workspace
+env.bat
