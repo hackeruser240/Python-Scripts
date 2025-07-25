@@ -5,36 +5,52 @@ import pandas as pd
 import fnmatch
 import logging
 
-# --- Configure the logger ---
-# Get the directory of the current script
-script_dir = os.path.dirname(os.path.abspath(__file__))
-log_file_path = os.path.join(script_dir, "log.txt")
-
-# Create a logger instance
+# Global logger instance (will be configured by loggerSetup)
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO) # Set the logging level to INFO
 
-# Create file handler which logs even debug messages
-# Using 'w' mode to overwrite the log file each time the script runs.
-# Change to 'a' if you want to append to the log file.
-fh = logging.FileHandler(log_file_path, mode='w')
-fh.setLevel(logging.INFO)
+def loggerSetup(log_file_name: str = "log.txt", log_level=logging.INFO, file_mode: str = 'w'):
+    """
+    Sets up the global logger to output messages to both a file and the console (CMD).
 
-# Create console handler with a higher log level
-ch = logging.StreamHandler()
-ch.setLevel(logging.INFO)
+    Parameters:
+    - log_file_name (str): The name of the log file to create in the script's directory.
+                           Defaults to "log.txt".
+    - log_level (int): The minimum logging level to capture (e.g., logging.INFO, logging.DEBUG).
+                       Defaults to logging.INFO.
+    - file_mode (str): The mode to open the log file in ('w' for overwrite, 'a' for append).
+                       Defaults to 'w'.
 
-# Create formatter and add it to the handlers
-formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-fh.setFormatter(formatter)
-ch.setFormatter(formatter)
+    Returns:
+    - None: This function configures the global logger instance.
+    """
+    # Get the directory of the current script
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    log_file_path = os.path.join(script_dir, log_file_name)
 
-# Add the handlers to the logger
-# Clear existing handlers to prevent duplicate logs if run multiple times in an interactive session
-if logger.hasHandlers():
-    logger.handlers.clear()
-logger.addHandler(fh)
-logger.addHandler(ch)
+    logger.setLevel(log_level)
+
+    # Create file handler which logs messages to the specified file
+    fh = logging.FileHandler(log_file_path, mode=file_mode)
+    fh.setLevel(log_level)
+
+    # Create console handler with a higher log level
+    ch = logging.StreamHandler()
+    ch.setLevel(log_level)
+
+    # Create formatter and add it to the handlers
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    fh.setFormatter(formatter)
+    ch.setFormatter(formatter)
+
+    # Add the handlers to the logger
+    # Clear existing handlers to prevent duplicate logs if run multiple times in an interactive session
+    if logger.hasHandlers():
+        logger.handlers.clear()
+    logger.addHandler(fh)
+    logger.addHandler(ch)
+
+# Call loggerSetup once at the beginning to configure the logger
+loggerSetup()
 
 # --------------------------------UDF's--------------------------------
 
