@@ -5,8 +5,7 @@ import pandas as pd
 import fnmatch
 import logging
 
-# Global logger instance (will be configured by loggerSetup)
-logger = logging.getLogger(__name__)
+
 
 def loggerSetup(log_file_name: str = "log.txt", log_level=logging.INFO, file_mode: str = 'w'):
     """
@@ -49,8 +48,7 @@ def loggerSetup(log_file_name: str = "log.txt", log_level=logging.INFO, file_mod
     logger.addHandler(fh)
     logger.addHandler(ch)
 
-# Call loggerSetup once at the beginning to configure the logger
-loggerSetup()
+
 
 # --------------------------------UDF's--------------------------------
 
@@ -69,7 +67,7 @@ def findMedia(media: str, directory: str) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     try:
         if media in ['images', 'image']:
-            extensions = ('*.jpg', '*.jpeg', '*.png', '*.gif', '*.bmp', '*.tiff')
+            extensions = ('*.jpg', '*.jpeg', '*.png', '*.gif', '*.bmp', '*.tiff', '*.jfif')
         elif media in ['video', 'videos']:
             extensions = ('*.mp4', '*.mpeg', '*.mkv', '*.avi', '*.mov', '*.wmv', '*.flv')
         else:
@@ -234,6 +232,10 @@ def main():
     parser.add_argument("--media", required=True, type=str, choices=['images', 'videos'], help='Select the type of media.')
     args = parser.parse_args()
 
+    
+    # Call loggerSetup once at the beginning to configure the logger
+    loggerSetup()
+
     path = rf'{args.path}'
     media = rf'{args.media}'
 
@@ -332,4 +334,7 @@ def main():
 
 # Entry point for the script
 if __name__ == "__main__":
+    # Global logger instance (will be configured by loggerSetup)
+    logger = logging.getLogger(__name__)
+
     main()
