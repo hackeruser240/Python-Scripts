@@ -5,7 +5,7 @@ import pandas as pd
 import fnmatch
 import logging
 # Import the AppVariables class from variables.py
-from variables import AppVariables
+from scripts.variables import AppVariables
 
 logger = logging.getLogger(__name__)
 
