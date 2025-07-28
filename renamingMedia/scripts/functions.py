@@ -1,13 +1,17 @@
 import os
 import sys
-import argparse as ag
+import argparse as ag # Not used in provided snippet, can be removed if not used elsewhere
 import pandas as pd
 import fnmatch
 import logging
+# Import the AppVariables class from variables.py
+from variables import AppVariables
 
 logger = logging.getLogger(__name__)
 
-def loggerSetup(log_file_name: str = "log.txt", log_level=logging.INFO, file_mode: str = 'w'):
+def loggerSetup(log_file_name: str = AppVariables.LOG_FILE_NAME,
+                log_level=AppVariables.LOG_LEVEL,
+                file_mode: str = AppVariables.LOG_FILE_MODE):
     """
     Sets up the global logger to output messages to both a file and the console (CMD).
 
@@ -63,12 +67,14 @@ def findMedia(media: str, directory: str) -> tuple[pd.DataFrame, pd.DataFrame]:
       - df_strings: Contains files with alphanumeric or string names and their extensions.
     """
     try:
-        if media in ['images', 'image']:
-            extensions = ('*.jpg', '*.jpeg', '*.png', '*.gif', '*.bmp', '*.tiff', '*.jfif')
-        elif media in ['video', 'videos']:
-            extensions = ('*.mp4', '*.mpeg', '*.mkv', '*.avi', '*.mov', '*.wmv', '*.flv')
+        extensions = () # Initialize with an empty tuple
+
+        if media == AppVariables.MEDIA_TYPE_IMAGES:
+            extensions = AppVariables.IMAGE_EXTENSIONS
+        elif media == AppVariables.MEDIA_TYPE_VIDEOS:
+            extensions = AppVariables.VIDEO_EXTENSIONS
         else:
-            logger.error(f"Invalid media type specified: '{media}'. Please choose 'images' or 'videos'.")
+            logger.error(f"Invalid media type specified: '{media}'. Please choose '{AppVariables.MEDIA_TYPE_IMAGES}' or '{AppVariables.MEDIA_TYPE_VIDEOS}'.")
             sys.exit(1)
 
         number_names, extension1 = [], []
