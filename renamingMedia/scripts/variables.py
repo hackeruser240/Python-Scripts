@@ -10,7 +10,7 @@ class AppVariables:
     MEDIA_TYPE_VIDEOS = 'videos'
 
     # --- Supported File Extensions ---
-    IMAGE_EXTENSIONS = ('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.jfif')
+    IMAGE_EXTENSIONS = ('.JPG', '.JPEG', '.PNG', '.GIF', '.BMP', '.TIFF', '.JFIF')
     VIDEO_EXTENSIONS = ('.mp4', '.mpeg', '.mkv', '.avi', '.mov', '.wmv', '.flv')
 
     # --- Logging Configuration ---
