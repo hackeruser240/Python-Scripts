@@ -2,3 +2,4 @@ python-env/
 anconda_projects/db/
 .ipynb_checkpoints/
 env.bat
+renamingMedia/scripts/__pycache__
