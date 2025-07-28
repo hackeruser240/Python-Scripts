@@ -2,36 +2,62 @@ import os
 import sys
 import argparse as ag
 import pandas as pd
-import fnmatch
 import logging
 
+# Import the AppVariables class from your variables.py file
+from scripts.variables import AppVariables
+
+# Import all necessary functions from your scripts.functions module
+# Ensure 'scripts' is a package (i.e., has an __init__.py file)
+# or adjust the import path if functions.py is directly in the same directory.
 from scripts.functions import (
     loggerSetup,
     findMedia,
-    findingBreakingPoint,
+    findingBreakingPoint, # Not directly used in main, but kept for completeness
     renamingFiles,
-    renamingStrings )
+    renamingStrings
+)
 
-
+# Initialize the logger for this module.
+# The actual configuration (handlers, formatters, level) will be set by loggerSetup().
+logger = logging.getLogger(__name__)
 
 def main():
     """
     Main function to parse arguments, find media, process names, and rename files.
+    This function now leverages variables defined in AppVariables for configuration.
     """
     parser = ag.ArgumentParser(description='''
     This script helps in renaming media (images or video) in a given directory!
     ''')
 
-    parser.add_argument("--path", required=True, type=str, help='Enter the directory in which you want your images or videos renamed')
-    parser.add_argument("--media", required=True, type=str, choices=['images', 'videos'], help='Select the type of media.')
+    # Use AppVariables.MEDIA_TYPE_IMAGES and AppVariables.MEDIA_TYPE_VIDEOS for choices
+    parser.add_argument(
+        "--path",
+        required=True,
+        type=str,
+        help='Enter the directory in which you want your images or videos renamed'
+    )
+    parser.add_argument(
+        "--media",
+        required=True,
+        type=str,
+        choices=[AppVariables.MEDIA_TYPE_IMAGES, AppVariables.MEDIA_TYPE_VIDEOS],
+        help='Select the type of media.'
+    )
     args = parser.parse_args()
 
-    
-    # Call loggerSetup once at the beginning to configure the logger
-    loggerSetup()
+    # Call loggerSetup once at the beginning to configure the logger.
+    # It now uses the default values from AppVariables, but can still be overridden
+    # if parameters are explicitly passed to loggerSetup().
+    loggerSetup(
+        log_file_name=AppVariables.LOG_FILE_NAME,
+        log_level=AppVariables.LOG_LEVEL,
+        file_mode=AppVariables.LOG_FILE_MODE
+    )
 
-    path = rf'{args.path}'
-    media = rf'{args.media}'
+    path = os.path.abspath(args.path) # Use abspath for clarity and consistency
+    media = args.media # No need for rf'' here, it's already a string
 
     logger.info(f"Script started for path: '{path}' and media type: '{media}'")
 
@@ -128,7 +154,6 @@ def main():
 
 # Entry point for the script
 if __name__ == "__main__":
-    # Global logger instance (will be configured by loggerSetup)
-    logger = logging.getLogger(__name__)
-
+    # The 'logger' for this module is already defined at the top.
+    # No need to redefine it here.
     main()
