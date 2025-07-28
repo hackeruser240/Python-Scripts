@@ -20,7 +20,7 @@ from scripts.functions import (
 
 # Initialize the logger for this module.
 # The actual configuration (handlers, formatters, level) will be set by loggerSetup().
-logger = logging.getLogger(__name__)
+
 
 def main():
     """
@@ -156,4 +156,5 @@ def main():
 if __name__ == "__main__":
     # The 'logger' for this module is already defined at the top.
     # No need to redefine it here.
+    logger = logging.getLogger(__name__)
     main()
