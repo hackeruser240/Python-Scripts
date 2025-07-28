@@ -4,8 +4,7 @@ import argparse as ag # Not used in provided snippet, can be removed if not used
 import pandas as pd
 import fnmatch
 import logging
-# Import the AppVariables class from variables.py
-from scripts.variables import AppVariables
+from scripts.variables import AppVariables # Ensure this import is correct
 
 logger = logging.getLogger(__name__)
 
@@ -14,6 +13,9 @@ def loggerSetup(log_file_name: str = AppVariables.LOG_FILE_NAME,
                 file_mode: str = AppVariables.LOG_FILE_MODE):
     """
     Sets up the global logger to output messages to both a file and the console (CMD).
+    This function now uses logging.basicConfig to configure the root logger,
+    which all other loggers (like 'renamingMedia' and 'scripts.functions')
+    will inherit from by default.
 
     Parameters:
     - log_file_name (str): The name of the log file to create in the script's directory.
@@ -26,36 +28,27 @@ def loggerSetup(log_file_name: str = AppVariables.LOG_FILE_NAME,
     Returns:
     - None: This function configures the global logger instance.
     """
-    # Get the directory of the current script
     script_dir = os.path.dirname(os.path.abspath(__file__))
     log_file_path = os.path.join(script_dir, log_file_name)
 
-    logger.setLevel(log_level)
-
-    # Create file handler which logs messages to the specified file
-    fh = logging.FileHandler(log_file_path, mode=file_mode)
-    fh.setLevel(log_level)
-
-    # Create console handler with a higher log level
-    ch = logging.StreamHandler()
-    ch.setLevel(log_level)
-
-    # Create formatter and add it to the handlers
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-    fh.setFormatter(formatter)
-    ch.setFormatter(formatter)
-
-    # Add the handlers to the logger
-    # Clear existing handlers to prevent duplicate logs if run multiple times in an interactive session
-    if logger.hasHandlers():
-        logger.handlers.clear()
-    logger.addHandler(fh)
-    logger.addHandler(ch)
+    # Configure the root logger. This is the most straightforward way
+    # to ensure all loggers (including 'renamingMedia' and 'scripts.functions')
+    # get the same basic configuration.
+    logging.basicConfig(
+        level=log_level,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.FileHandler(log_file_path, mode=file_mode),
+            logging.StreamHandler(sys.stdout) # Explicitly use sys.stdout for console
+        ],
+        force=True # Ensures basicConfig can be called multiple times in interactive sessions
+    )
 
 
 def findMedia(media: str, directory: str) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Identifies and categorizes media files (images or videos) within a specified directory.
+    This version converts file extensions to lowercase for robust matching.
 
     Parameters:
     - media (str): The type of media to search for ('images' or 'videos').
@@ -67,12 +60,12 @@ def findMedia(media: str, directory: str) -> tuple[pd.DataFrame, pd.DataFrame]:
       - df_strings: Contains files with alphanumeric or string names and their extensions.
     """
     try:
-        extensions = () # Initialize with an empty tuple
-
+        # Define expected extensions in lowercase
         if media == AppVariables.MEDIA_TYPE_IMAGES:
-            extensions = AppVariables.IMAGE_EXTENSIONS
+            # Use lowercase extensions here, as we'll convert actual file extensions to lowercase
+            allowed_extensions = AppVariables.IMAGE_EXTENSIONS
         elif media == AppVariables.MEDIA_TYPE_VIDEOS:
-            extensions = AppVariables.VIDEO_EXTENSIONS
+            allowed_extensions = AppVariables.VIDEO_EXTENSIONS
         else:
             logger.error(f"Invalid media type specified: '{media}'. Please choose '{AppVariables.MEDIA_TYPE_IMAGES}' or '{AppVariables.MEDIA_TYPE_VIDEOS}'.")
             sys.exit(1)
@@ -83,18 +76,22 @@ def findMedia(media: str, directory: str) -> tuple[pd.DataFrame, pd.DataFrame]:
         all_files_in_dir = os.listdir(directory)
         found_media_count = 0
 
-        for ext_pattern in extensions:
-            for filename in fnmatch.filter(all_files_in_dir, ext_pattern):
-                found_media_count += 1
-                name = os.path.splitext(filename)[0]
-                ext = os.path.splitext(filename)[1]
+        for filename in all_files_in_dir:
+            # Get the file extension and convert it to lowercase for comparison
+            name, ext = os.path.splitext(filename)
+            ext_lower = ext.lower() # <--- KEY CHANGE HERE
 
+            # Check if the lowercase extension is in our allowed list
+            # We also need to add a '*' to the allowed_extensions if they are like '.jpg'
+            # Or, more simply, check if ext_lower is in a set of allowed extensions
+            if ext_lower in allowed_extensions: # <--- KEY CHANGE HERE
+                found_media_count += 1
                 if name.isdigit():
                     number_names.append(int(name))
-                    extension1.append(ext)
+                    extension1.append(ext) # Keep original case for renaming
                 else:
                     string_names.append(name)
-                    extension2.append(ext)
+                    extension2.append(ext) # Keep original case for renaming
 
         df_numbers = pd.DataFrame({"Filenames": number_names, "Extensions": extension1})
         df_strings = pd.DataFrame({"Filenames": string_names, "Extensions": extension2})

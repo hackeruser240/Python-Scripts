@@ -10,7 +10,8 @@ class AppVariables:
     MEDIA_TYPE_VIDEOS = 'videos'
 
     # --- Supported File Extensions ---
-    IMAGE_EXTENSIONS = ('.JPG', '.JPEG', '.PNG', '.GIF', '.BMP', '.TIFF', '.JFIF')
+    # Now using lowercase extensions, as findMedia will convert actual file extensions to lowercase
+    IMAGE_EXTENSIONS = ('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.jfif', '.webp', '.heic') # Added .webp and .heic as common examples
     VIDEO_EXTENSIONS = ('.mp4', '.mpeg', '.mkv', '.avi', '.mov', '.wmv', '.flv')
 
     # --- Logging Configuration ---
