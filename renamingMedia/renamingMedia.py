@@ -1,160 +1,56 @@
-import os
-import sys
-import argparse as ag
-import pandas as pd
 import logging
+import tkinter as tk # Import tkinter for the GUI root window
 
-# Import the AppVariables class from your variables.py file
+# Import the AppVariables class for centralized configuration
+
 from scripts.variables import AppVariables
 
-# Import all necessary functions from your scripts.functions module
-# Ensure 'scripts' is a package (i.e., has an __init__.py file)
-# or adjust the import path if functions.py is directly in the same directory.
-from scripts.functions import (
-    loggerSetup,
-    findMedia,
-    findingBreakingPoint, # Not directly used in main, but kept for completeness
-    renamingFiles,
-    renamingStrings
-)
+# Import your GUI application class from gui_app.py
+from gui_app import RenamerApp
 
-# Initialize the logger for this module.
-# The actual configuration (handlers, formatters, level) will be set by loggerSetup().
+# Import loggerSetup from your scripts.functions module
+# This function is responsible for setting up the logging handlers and formatters.
+from scripts.functions import loggerSetup
 
+# Initialize the logger for this main module.
+# Log messages from this logger will also go to the GUI's log window
+# once loggerSetup configures the root logger.
+logger = logging.getLogger(__name__)
 
 def main():
     """
-    Main function to parse arguments, find media, process names, and rename files.
-    This function now leverages variables defined in AppVariables for configuration.
+    Main function to initialize the logging system and launch the Tkinter GUI application.
+    This file now acts purely as the entry point for the GUI.
     """
-    parser = ag.ArgumentParser(description='''
-    This script helps in renaming media (images or video) in a given directory!
-    ''')
-
-    # Use AppVariables.MEDIA_TYPE_IMAGES and AppVariables.MEDIA_TYPE_VIDEOS for choices
-    parser.add_argument(
-        "--path",
-        required=True,
-        type=str,
-        help='Enter the directory in which you want your images or videos renamed'
-    )
-    parser.add_argument(
-        "--media",
-        required=True,
-        type=str,
-        choices=[AppVariables.MEDIA_TYPE_IMAGES, AppVariables.MEDIA_TYPE_VIDEOS],
-        help='Select the type of media.'
-    )
-    args = parser.parse_args()
-
-    # Call loggerSetup once at the beginning to configure the logger.
-    # It now uses the default values from AppVariables, but can still be overridden
-    # if parameters are explicitly passed to loggerSetup().
+    # 1. Configure the logging system first.
+    # This ensures that all subsequent log messages (from GUI or core functions)
+    # are captured by the file handler and the GUI's TextWidgetHandler.
     loggerSetup(
         log_file_name=AppVariables.LOG_FILE_NAME,
         log_level=AppVariables.LOG_LEVEL,
         file_mode=AppVariables.LOG_FILE_MODE
     )
+    logger.info("Application starting up: Initializing GUI.")
 
-    path = os.path.abspath(args.path) # Use abspath for clarity and consistency
-    media = args.media # No need for rf'' here, it's already a string
+    # 2. Create the main Tkinter root window.
+    # This is the top-level window for your GUI application.
+    root = tk.Tk()
+    root.title("Media Renamer Application") # Set the title of the main window
 
-    logger.info(f"Script started for path: '{path}' and media type: '{media}'")
+    # 3. Create an instance of your RenamerApp GUI class.
+    # This will build all the user interface elements within the 'root' window.
+    app = RenamerApp(root)
 
-    # 1. Find and categorize media files
-    numbers_df, strings_df = findMedia(media, path)
+    # 4. Start the Tkinter event loop.
+    # This line is crucial for a GUI application. It makes the window appear,
+    # keeps it responsive to user interactions (clicks, keyboard input),
+    # and processes all Tkinter events. The script will remain running
+    # until the window is closed.
+    root.mainloop()
 
-    logger.info("\n" + "="*40 + "\nInitial DataFrames:\n" + "="*40)
-    logger.info("DataFrame 'numbers' initial:\n" + str(numbers_df.head()))
-    logger.info("DataFrame 'strings' initial:\n" + str(strings_df.head()))
+    logger.info("Application closed: GUI window terminated.")
 
-    max_existing_number = 0
-
-    # 2. Process numeric files
-    if not numbers_df.empty:
-        try:
-            # Sort numeric files by their current names
-            numbers_df = numbers_df.sort_values(by='Filenames', ascending=True, ignore_index=True)
-
-            # Generate new sequential names for numeric files
-            existing_numeric_names_set = set(numbers_df['Filenames'].tolist())
-            new_names_for_numbers = []
-            current_expected_number = 1
-
-            for index, row in numbers_df.iterrows():
-                # If the current filename is already the expected sequential number, keep it
-                if row['Filenames'] == current_expected_number:
-                    new_names_for_numbers.append(current_expected_number)
-                    current_expected_number += 1
-                else:
-                    # If there's a gap or a non-sequential number, assign the next available unique number
-                    # This loop ensures the assigned number is not already taken by an existing file
-                    while current_expected_number in existing_numeric_names_set:
-                        current_expected_number += 1
-                    new_names_for_numbers.append(current_expected_number)
-                    current_expected_number += 1
-
-            numbers_df['New names'] = new_names_for_numbers
-            logger.info("\n" + "="*40 + "\nDataFrame 'numbers' with 'New names':\n" + "="*40)
-            logger.info(numbers_df.to_string()) # Use to_string() to show all rows
-
-            max_existing_number = numbers_df['New names'].max()
-        except Exception as e:
-            logger.error(f"Error processing numeric files: {e}")
-            sys.exit(1)
-    else:
-        logger.info("There are no numeric filenames in the given path!")
-        max_existing_number = 0 # If no numeric files, start string numbering from 1
-
-    # 3. Determine starting point for string files
-    starting_point_for_strings = max_existing_number + 1
-    logger.info(f"Starting point for renaming string files: {starting_point_for_strings}")
-
-    # 4. Process string files
-    if not strings_df.empty:
-        strings_df = renamingStrings(strings_df, starting_point_for_strings)
-    else:
-        logger.info("Not processing any string names!")
-
-    # 5. Combine both DataFrames
-    final_df = pd.DataFrame()
-    if numbers_df.empty and strings_df.empty:
-        logger.info("No media files found to rename.")
-    elif numbers_df.empty:
-        final_df = strings_df
-    elif strings_df.empty:
-        final_df = numbers_df
-    else:
-        try:
-            final_df = pd.concat([numbers_df, strings_df], ignore_index=True)
-            # Ensure 'New names' column is integer type in the combined DataFrame
-            final_df['New names'] = final_df['New names'].astype("Int64")
-        except Exception as e:
-            logger.error(f"Error concatenating DataFrames: {e}")
-            sys.exit(1)
-
-    # Sort final DataFrame by 'New names' to ensure correct processing order
-    if not final_df.empty:
-        try:
-            final_df = final_df.sort_values(by='New names', ascending=True, ignore_index=True)
-        except KeyError:
-            logger.error("Error: 'New names' column missing in final DataFrame during sorting.")
-            sys.exit(1)
-        except Exception as e:
-            logger.error(f"Error sorting final DataFrame: {e}")
-            sys.exit(1)
-
-    logger.info("\n" + "="*40 + "\nFinal combined DataFrame for renaming:\n" + "="*40)
-    logger.info(final_df.to_string()) # Use to_string() to show all rows
-
-    # 6. Finally rename the files
-    renamingFiles(final_df, path)
-
-    logger.info("\n" + "="*40 + "\nScript execution finished.\n" + "="*40)
-
-# Entry point for the script
+# Entry point for the script execution.
+# This block ensures that 'main()' is called only when the script is executed directly.
 if __name__ == "__main__":
-    # The 'logger' for this module is already defined at the top.
-    # No need to redefine it here.
-    logger = logging.getLogger(__name__)
     main()
