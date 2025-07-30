@@ -7,6 +7,6 @@ rmdir /S /Q "dist" 2>nul
 echo Cleaning complete.
 
 rem Run PyInstaller command
-pyinstaller --clean --onefile --noconsole --name="Renaming Media" --add-binary "C:\Users\HP\AppData\Local\Programs\Python\Python312\DLLs\pyexpat.pyd;." renamingMedia.py
+pyinstaller --clean --onefile --noconsole --name="Renaming Media" --add-binary "C:\Users\HP\AppData\Local\Programs\Python\Python312\DLLs\pyexpat.pyd;." --add-data "app-icon.ico;." renamingMedia.py
 
 echo Build process finished.
