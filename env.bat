@@ -1,1 +1,0 @@
-python-env\Scripts\activate.bat
