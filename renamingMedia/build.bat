@@ -1,0 +1,1 @@
+pyinstaller --clean --onefile --noconsole --name="Renaming Media" --add-binary "C:\Users\HP\AppData\Local\Programs\Python\Python312\DLLs\pyexpat.pyd;," renamingMedia.py
