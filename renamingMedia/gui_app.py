@@ -61,22 +61,42 @@ class RenamerApp:
         """
         self.master = master
         master.title("Media Renamer")
-        master.geometry("700x600") # Set a default window size
-        master.resizable(True, True) # Allow window resizing
+        master.geometry("700x600")
+        master.resizable(True, True)
+
+        # --- Set Application Icon ---
+        # Get the directory of the current script
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        icon_path = os.path.join(script_dir, "app_icon.ico") # Assuming app_icon.ico is in the same directory
+
+        try:
+            # For .ico files (preferred for Windows, works cross-platform)
+            master.iconbitmap(icon_path)
+        except tk.TclError:
+            # Fallback for .png/.gif files or if .ico fails (e.g., on Linux/macOS, or if iconbitmap isn't supported)
+            # You would need to load it as PhotoImage for iconphoto
+            try:
+                # If using .png or .gif, uncomment and modify this block:
+                # photo_icon = tk.PhotoImage(file=os.path.join(script_dir, "app_icon.png"))
+                # master.iconphoto(True, photo_icon) # True for default icon for Toplevel windows too
+                logging.warning(f"Could not load icon from {icon_path} using iconbitmap. Trying iconphoto or ensure .ico format.")
+            except Exception as e:
+                logging.warning(f"Could not set application icon: {e}")
+
 
         # Configure grid weights for responsive layout
-        master.grid_rowconfigure(0, weight=0) # Controls frame
-        master.grid_rowconfigure(1, weight=1) # Log window
+        master.grid_rowconfigure(0, weight=0)
+        master.grid_rowconfigure(1, weight=1)
         master.grid_columnconfigure(0, weight=1)
 
         # --- Variables ---
         self.directory_path = tk.StringVar()
-        self.media_type = tk.StringVar(value=AppVariables.MEDIA_TYPE_IMAGES) # Default to images
+        self.media_type = tk.StringVar(value=AppVariables.MEDIA_TYPE_IMAGES)
 
         # --- Frames for layout ---
         self.controls_frame = tk.Frame(master, padx=10, pady=10)
         self.controls_frame.grid(row=0, column=0, sticky="nsew")
-        self.controls_frame.grid_columnconfigure(1, weight=1) # Make entry field expandable
+        self.controls_frame.grid_columnconfigure(1, weight=1)
 
         self.log_frame = tk.Frame(master, padx=10, pady=10)
         self.log_frame.grid(row=1, column=0, sticky="nsew")
@@ -96,7 +116,7 @@ class RenamerApp:
         self.image_radio = tk.Radiobutton(self.controls_frame, text="Images", variable=self.media_type, value=AppVariables.MEDIA_TYPE_IMAGES)
         self.image_radio.grid(row=1, column=1, sticky="w", padx=5, pady=5)
         self.video_radio = tk.Radiobutton(self.controls_frame, text="Videos", variable=self.media_type, value=AppVariables.MEDIA_TYPE_VIDEOS)
-        self.video_radio.grid(row=1, column=1, sticky="w", padx=(80,0), pady=5) # Offset to place next to images radio
+        self.video_radio.grid(row=1, column=1, sticky="w", padx=(80,0), pady=5)
 
         # --- Action Button ---
         self.rename_button = tk.Button(self.controls_frame, text="Start Renaming", command=self.start_renaming,
@@ -116,8 +136,8 @@ class RenamerApp:
 
         # Attach custom handler to the root logger
         self.log_handler = TextWidgetHandler(self.log_text_widget)
-        logging.getLogger().addHandler(self.log_handler) # Add to root logger
-        logging.getLogger().setLevel(AppVariables.LOG_LEVEL) # Ensure root logger level is set
+        logging.getLogger().addHandler(self.log_handler)
+        logging.getLogger().setLevel(AppVariables.LOG_LEVEL)
 
         # Initial log message to confirm setup
         logging.info("GUI application initialized. Please select a directory and media type.")
