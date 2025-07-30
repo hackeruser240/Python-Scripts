@@ -7,3 +7,5 @@ anconda_projects/db/
 renamingMedia/scripts/__pycache__
 renamingMedia/scripts/log.txt
 renamingMedia/__pycache__
+renamingMedia/build/
+renamingMedia/dist/
