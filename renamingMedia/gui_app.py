@@ -65,23 +65,38 @@ class RenamerApp:
         master.resizable(True, True)
 
         # --- Set Application Icon ---
-        # Get the directory of the current script
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        icon_path = os.path.join(script_dir, "app_icon.ico") # Assuming app_icon.ico is in the same directory
+        # Determine the base directory for resources, handling PyInstaller's _MEIPASS
+        if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+            # Running as a bundled executable
+            script_base_dir = sys._MEIPASS
+        else:
+            # Running as a script
+            script_base_dir = os.path.dirname(os.path.abspath(__file__))
+
+        icon_filename = "app_icon.png" # RECOMMENDED: Use .png for PhotoImage compatibility
+                                       # Make sure app_icon.png is in the same directory as gui_app.py
+        icon_path = os.path.join(script_base_dir, icon_filename)
 
         try:
-            # For .ico files (preferred for Windows, works cross-platform)
-            master.iconbitmap(icon_path)
-        except tk.TclError:
-            # Fallback for .png/.gif files or if .ico fails (e.g., on Linux/macOS, or if iconbitmap isn't supported)
-            # You would need to load it as PhotoImage for iconphoto
+            # Attempt to load the icon using PhotoImage and iconphoto (more robust)
+            photo_icon = tk.PhotoImage(file=icon_path)
+            master.iconphoto(True, photo_icon) # Set as default icon for all Toplevel windows
+            logging.info(f"Successfully set application icon from: {icon_path}")
+        except tk.TclError as e:
+            logging.error(f"Error loading or setting icon from '{icon_path}' with PhotoImage/iconphoto: {e}")
+            # Fallback attempt for .ico specifically with iconbitmap, if PhotoImage failed
+            # This block is less preferred but kept for historical compatibility or specific .ico needs
             try:
-                # If using .png or .gif, uncomment and modify this block:
-                # photo_icon = tk.PhotoImage(file=os.path.join(script_dir, "app_icon.png"))
-                # master.iconphoto(True, photo_icon) # True for default icon for Toplevel windows too
-                logging.warning(f"Could not load icon from {icon_path} using iconbitmap. Trying iconphoto or ensure .ico format.")
-            except Exception as e:
-                logging.warning(f"Could not set application icon: {e}")
+                # If icon_filename was originally "app_icon.ico", try iconbitmap directly
+                # Note: This might still fail for PyInstaller temp paths.
+                master.iconbitmap(os.path.join(script_base_dir, "app_icon.ico"))
+                logging.info(f"Successfully set application icon using iconbitmap from: {os.path.join(script_base_dir, 'app_icon.ico')}")
+            except tk.TclError as e_ico:
+                logging.error(f"Failed to set icon even with iconbitmap for '{os.path.join(script_base_dir, 'app_icon.ico')}': {e_ico}. Ensure .ico file is valid.")
+            except Exception as e_gen:
+                logging.error(f"An unexpected error occurred during icon setup fallback: {e_gen}")
+        except Exception as e:
+            logging.error(f"An unexpected error occurred during initial icon setup: {e}")
 
 
         # Configure grid weights for responsive layout
