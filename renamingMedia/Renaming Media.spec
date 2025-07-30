@@ -4,8 +4,8 @@
 a = Analysis(
     ['renamingMedia.py'],
     pathex=[],
-    binaries=[('C:\\Users\\HP\\AppData\\Local\\Programs\\Python\\Python312\\DLLs\\pyexpat.pyd', ',')],
-    datas=[],
+    binaries=[('C:\\Users\\HP\\AppData\\Local\\Programs\\Python\\Python312\\DLLs\\pyexpat.pyd', '.')],
+    datas=[('app_icon.ico', '.')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
