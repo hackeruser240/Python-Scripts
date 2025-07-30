@@ -18,7 +18,7 @@ def loggerSetup(log_file_name: str = AppVariables.LOG_FILE_NAME,
     will inherit from by default.
 
     Parameters:
-    - log_file_name (str): The name of the log file to create in the script's directory.
+    - log_file_name (str): The name of the log file to create in the current working directory.
                            Defaults to "log.txt".
     - log_level (int): The minimum logging level to capture (e.g., logging.INFO, logging.DEBUG).
                        Defaults to logging.INFO.
@@ -28,22 +28,22 @@ def loggerSetup(log_file_name: str = AppVariables.LOG_FILE_NAME,
     Returns:
     - None: This function configures the global logger instance.
     """
-    script_dir = os.path.dirname(os.path.abspath(__file__))
+    script_dir = os.getcwd()  # Use current working directory
+    os.makedirs(script_dir, exist_ok=True)  # Ensure directory exists
+
     log_file_path = os.path.join(script_dir, log_file_name)
 
-    # Configure the root logger. This is the most straightforward way
-    # to ensure all loggers (including 'renamingMedia' and 'scripts.functions')
-    # get the same basic configuration.
     logging.basicConfig(
         level=log_level,
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S',
         handlers=[
             logging.FileHandler(log_file_path, mode=file_mode),
-            logging.StreamHandler(sys.stdout) # Explicitly use sys.stdout for console
+            logging.StreamHandler(sys.stdout)
         ],
-        force=True # Ensures basicConfig can be called multiple times in interactive sessions
+        force=True
     )
+
 
 
 def findMedia(media: str, directory: str) -> tuple[pd.DataFrame, pd.DataFrame]:
