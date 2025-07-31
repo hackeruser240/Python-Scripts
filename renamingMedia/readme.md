@@ -59,24 +59,19 @@ To create a standalone executable that doesn't require a Python environment on t
     * `PyInstaller` library: `pip install pyinstaller`
     * `pandas` library: `pip install pandas` (needed for the build process)
 
-2.  **Navigate to the project root:**
-    Open your command prompt or terminal and change your directory to the root of your project where `renamingMedia.py` and `gui_app.py` are located, alongside the `scripts` folder.
+2.  **Create Virtual Environment (recommended)**
+    Activate your python terminal.
+   
 
-3.  **Ensure icon file is present:**
-    Make sure `app_icon.png` (or `app_icon.ico` if you prefer to use `.ico` and handle it in your PyInstaller spec) is in the root directory of your project.
+3.  **Run `requirements.bat`**
+    To make sure your python environment has the required modules, you may run the `requirements.bat` to install/update the necessary packages.
 
-4.  **Run the PyInstaller command:**
-    You can use the provided `build.bat` file (if you have one) or directly run the PyInstaller command.
-
-    **Using `build.bat` (Recommended):**
+4.  **Using `build.bat` (Recommended):**
     If you have the `build.bat` file from the instructions, just run:
     ```bash
     build.bat
     ```
-    This batch file automates cleaning previous builds and then running PyInstaller.
-
-    **Direct PyInstaller Command:**
-    Alternatively, manually execute the command. This command is designed for a windowed application (`--noconsole`), bundled into a single executable file (`--onefile`), cleans previous build artifacts, names the executable "Renaming Media", and includes necessary data files.
+    This batch file automates cleaning previous builds and then running PyInstaller. This command is bundled into a single executable file (`--onefile`), cleans previous build artifacts, names the executable "Renaming Media", and includes necessary data files.
 
     ```bash
     pyinstaller --clean --onefile --noconsole --name="Renaming Media" ^
