@@ -7,3 +7,8 @@ anconda_projects/db/
 renamingMedia/scripts/__pycache__
 renamingMedia/scripts/log.txt
 renamingMedia/__pycache__
+
+#transitionCode folder
+transitionCode/scripts/__pycache__
+transitionCode/scripts/log.txt
+transitionCode/__pycache__
