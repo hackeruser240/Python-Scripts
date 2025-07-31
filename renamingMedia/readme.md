@@ -29,11 +29,13 @@ You can run this application either directly from Python source files or as a st
     .
     ├── renamingMedia.py
     ├── gui_app.py
-    ├── app_icon.png  (or .ico if you changed the config)
+    ├── assets/
+    │   ├── app_icon.png  (or .ico if you changed the config)
     ├── scripts/
     │   ├── __init__.py  (empty file to make 'scripts' a Python package)
     │   ├── functions.py
     │   └── variables.py
+    ├── requirements.bat
     └── build.bat (if you created it)
     ```
 

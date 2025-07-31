@@ -9,7 +9,7 @@ echo Cleaning complete.
 echo ===========================================
 
 rem Run PyInstaller command
-pyinstaller --clean --onefile --noconsole --name="Renaming Media" --add-binary "C:\Users\HP\AppData\Local\Programs\Python\Python312\DLLs\pyexpat.pyd;." --add-data "app_icon.ico;." renamingMedia.py
+pyinstaller --clean --onefile --noconsole --name="Renaming Media" --add-binary "C:\Users\HP\AppData\Local\Programs\Python\Python312\DLLs\pyexpat.pyd;." --add-data "C:\Users\HP\OneDrive\Documents\pythonScripts\Py_scripts\renamingMedia\assets\app_icon.ico;." renamingMedia.py
 
 echo ===========================================
 echo Build process finished
