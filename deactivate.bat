@@ -1,0 +1,1 @@
+python-env\Scripts\deactivate.bat
