@@ -1,5 +1,7 @@
 import logging
 import os
+# Import the divide function from the new calculator module
+from calculator import divide
 
 def setup_logger():
     """
@@ -62,3 +64,11 @@ if __name__ == "__main__":
 
     calculate_something(10, 5)
     calculate_something(10, 0)
+
+    print("-" * 20)
+    print("Demonstrating logging from the 'calculator' module:")
+    print("-" * 20)
+    
+    # Use the function from the separate module
+    divide(20, 4)
+    divide(10, 0)
