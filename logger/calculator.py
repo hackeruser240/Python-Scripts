@@ -3,6 +3,9 @@ import logging
 # Get a logger instance for this specific module
 logger = logging.getLogger(__name__)
 
+# Add a NullHandler to prevent "No handlers found" warnings
+logger.addHandler(logging.NullHandler())
+
 def divide(x, y):
     """
     Performs division and logs an error if a ZeroDivisionError occurs.
