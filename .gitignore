@@ -12,3 +12,8 @@ renamingMedia/__pycache__
 transitionCode/scripts/__pycache__
 transitionCode/scripts/log.txt
 transitionCode/__pycache__
+
+
+#logger directory
+__pycache__/
+logger/logs/log.txt
