@@ -16,7 +16,7 @@ class AppVariables:
 
     # --- Logging Configuration ---
     LOG_FILE_NAME = "log.txt"
-    LOG_LEVEL = logging.INFO  # Default logging level
+    LOG_LEVEL = logging.DEBUG  # Default logging level
     LOG_FILE_MODE = 'w'       # Default file mode for log file ('w' for overwrite, 'a' for append)
 
     # You can add more variables here as your application grows, e.g.,
