@@ -2,6 +2,22 @@ import argparse
 import os
 import random
 import string
+import logging
+import sys
+
+def loggerSetup():
+    logger=logging.getLogger(__name__)
+    logger.setLevel(logging.INFO)
+    formatter= logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%d-%b-%Y %I:%M %p')
+
+    stream_handler=logging.StreamHandler(sys.stdout)
+    stream_handler.setLevel(logging.DEBUG)
+    stream_handler.setFormatter(formatter)
+
+    logger.addHandler(stream_handler)
+    
+    return logger
+
 
 def generate_random_name(length=15):
     """Generates a random alphanumeric string of a specified length."""
@@ -16,6 +32,8 @@ def scramble_media_names(path, media_type):
         path (str): The directory path containing the media files.
         media_type (str): The type of media to scramble ('image' or 'video').
     """
+
+    logger.info("Starting to scramble names")
     # Define common extensions for images and videos
     image_extensions = ('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.webp')
     video_extensions = ('.mp4', '.avi', '.mov', '.wmv', '.flv', '.mkv', '.webm')
@@ -25,7 +43,7 @@ def scramble_media_names(path, media_type):
     elif media_type == 'video':
         extensions_to_scramble = video_extensions
     else:
-        print(f"Error: Invalid media type '{media_type}'. Please choose 'image' or 'video'.")
+        logger.error(f"Error: Invalid media type '{media_type}'. Please choose 'image' or 'video'.")
         return
 
     if not os.path.isdir(path):
@@ -33,7 +51,7 @@ def scramble_media_names(path, media_type):
         return
 
     scrambled_count = 0
-    print(f"Scanning directory: {path} for {media_type} files...")
+    logger.info(f"Scanning directory: {path} for {media_type} files...")
 
     for filename in os.listdir(path):
         # Get the full path of the file
@@ -57,14 +75,16 @@ def scramble_media_names(path, media_type):
 
             try:
                 os.rename(file_path, new_file_path)
-                print(f"Renamed '{filename}' to '{new_filename}'")
+                logger.debug(f"Renamed '{filename}' to '{new_filename}'")
                 scrambled_count += 1
             except OSError as e:
-                print(f"Error renaming '{filename}': {e}")
+                logger.info(f"Error renaming '{filename}': {e}")
 
-    print(f"\nFinished scrambling. Total {scrambled_count} {media_type} files scrambled.")
+    logger.info(f"\nFinished scrambling. Total {scrambled_count} {media_type} files scrambled.")
 
 if __name__ == "__main__":
+    logger=loggerSetup()
+
     parser = argparse.ArgumentParser(
         description="Scramble (rename) image or video files in a specified directory to random alphanumeric names."
     )
