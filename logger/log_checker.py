@@ -1,6 +1,7 @@
 import logging
 import os
 from calculator import divide
+from multiplication import multiply_nums
 
 def setup_logger():
     """
@@ -55,3 +56,10 @@ if __name__ == "__main__":
     
     divide(20, 4)
     divide(10, 0)
+
+    logger.info("-" * 20)
+    logger.info("Demonstrating logging from the 'multiplication' module:")
+    logger.info("-" * 20)
+
+    multiply_nums(10,5)
+    multiply_nums(0,3)
