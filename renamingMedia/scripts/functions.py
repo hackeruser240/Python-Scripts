@@ -44,7 +44,7 @@ def loggerSetup(log_file_name: str = AppVariables.LOG_FILE_NAME,
     # Create and add a FileHandler for log.txt with a DEBUG level
     file_handler = logging.FileHandler(log_file_path, mode=file_mode)
     file_handler.setLevel(logging.DEBUG)
-    file_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+    file_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%d-%b-%Y %I:%M %p'))
     root_logger.addHandler(file_handler)
 
 
