@@ -9,7 +9,7 @@ from scripts.variables import AppVariables # Ensure this import is correct
 logger = logging.getLogger(__name__)
 
 def loggerSetup(log_file_name: str = AppVariables.LOG_FILE_NAME,
-                log_level=AppVariables.LOG_LEVEL,
+                log_level=AppVariables.LOG_LEVEL, # This can be set to DEBUG
                 file_mode: str = AppVariables.LOG_FILE_MODE):
     """
     Sets up the global logger to output messages to both a file and the console (CMD).
@@ -28,22 +28,24 @@ def loggerSetup(log_file_name: str = AppVariables.LOG_FILE_NAME,
     Returns:
     - None: This function configures the global logger instance.
     """
-    script_dir = os.getcwd()  # Use current working directory
-    os.makedirs(script_dir, exist_ok=True)  # Ensure directory exists
+    script_dir = os.getcwd()
+    os.makedirs(script_dir, exist_ok=True)
 
     log_file_path = os.path.join(script_dir, log_file_name)
 
-    logging.basicConfig(
-        level=log_level,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S',
-        handlers=[
-            logging.FileHandler(log_file_path, mode=file_mode),
-            logging.StreamHandler(sys.stdout)
-        ],
-        force=True
-    )
+    # Configure the root logger
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.DEBUG)  # Root logger level set to DEBUG
 
+    # Clear any existing handlers to prevent duplicates
+    if root_logger.hasHandlers():
+        root_logger.handlers.clear()
+
+    # Create and add a FileHandler for log.txt with a DEBUG level
+    file_handler = logging.FileHandler(log_file_path, mode=file_mode)
+    file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+    root_logger.addHandler(file_handler)
 
 
 def findMedia(media: str, directory: str) -> tuple[pd.DataFrame, pd.DataFrame]:

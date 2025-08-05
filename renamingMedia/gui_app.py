@@ -151,8 +151,8 @@ class RenamerApp:
 
         # Attach custom handler to the root logger
         self.log_handler = TextWidgetHandler(self.log_text_widget)
+        self.log_handler.setLevel(logging.INFO)  # Set the level for GUI output
         logging.getLogger().addHandler(self.log_handler)
-        logging.getLogger().setLevel(AppVariables.LOG_LEVEL)
 
         # Initial log message to confirm setup
         logging.info("GUI application initialized. Please select a directory and media type.")
@@ -247,9 +247,9 @@ class RenamerApp:
             if not final_df.empty:
                 final_df = final_df.sort_values(by='New names', ascending=True, ignore_index=True)
             
-            logging.info("\n--- Final Renaming Plan ---")
+            logging.debug("\n--- Final Renaming Plan ---")
             if not final_df.empty:
-                logging.info(final_df.to_string())
+                logging.debug(final_df.to_string())
             else:
                 logging.info("No files to rename based on the final plan.")
 
