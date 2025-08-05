@@ -16,4 +16,4 @@ transitionCode/__pycache__
 
 #logger directory
 __pycache__/
-logger/logs/log.txt
+logger/logs/
