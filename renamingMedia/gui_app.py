@@ -9,14 +9,15 @@ import pandas as pd
 from scripts.variables import AppVariables
 
 # Import core functions for renaming logic
-# Ensure 'scripts' is a package (i.e., has an __init__.py file)
-# or adjust the import path if functions.py is directly in the same directory.
 from scripts.functions import (
     findMedia,
     renamingStrings,
     renamingFiles,
     loggerSetup # loggerSetup is called in renamingMedia.py, but good to know it's there
 )
+
+# Import the scramble_media_names function from scripts.scrambled_names
+from scripts.scrambled_names import scramble_media_names
 
 # --- Custom Logging Handler for Tkinter Text Widget ---
 class TextWidgetHandler(logging.Handler):
@@ -85,10 +86,8 @@ class RenamerApp:
         except tk.TclError as e:
             logging.error(f"Error loading or setting icon from '{icon_path}' with PhotoImage/iconphoto: {e}")
             # Fallback attempt for .ico specifically with iconbitmap, if PhotoImage failed
-            # This block is less preferred but kept for historical compatibility or specific .ico needs
             try:
                 # If icon_filename was originally "app_icon.ico", try iconbitmap directly
-                # Note: This might still fail for PyInstaller temp paths.
                 master.iconbitmap(os.path.join(script_base_dir, "app_icon.ico"))
                 logging.info(f"Successfully set application icon using iconbitmap from: {os.path.join(script_base_dir, 'app_icon.ico')}")
             except tk.TclError as e_ico:
@@ -111,7 +110,11 @@ class RenamerApp:
         # --- Frames for layout ---
         self.controls_frame = tk.Frame(master, padx=10, pady=10)
         self.controls_frame.grid(row=0, column=0, sticky="nsew")
-        self.controls_frame.grid_columnconfigure(1, weight=1)
+        # Adjust column configuration to accommodate new button
+        self.controls_frame.grid_columnconfigure(1, weight=1) # Entry field column
+        self.controls_frame.grid_columnconfigure(2, weight=0) # Browse button column
+        self.controls_frame.grid_columnconfigure(3, weight=0) # New scramble button column
+
 
         self.log_frame = tk.Frame(master, padx=10, pady=10)
         self.log_frame.grid(row=1, column=0, sticky="nsew")
@@ -133,11 +136,27 @@ class RenamerApp:
         self.video_radio = tk.Radiobutton(self.controls_frame, text="Videos", variable=self.media_type, value=AppVariables.MEDIA_TYPE_VIDEOS)
         self.video_radio.grid(row=1, column=1, sticky="w", padx=(80,0), pady=5)
 
-        # --- Action Button ---
-        self.rename_button = tk.Button(self.controls_frame, text="Start Renaming", command=self.start_renaming,
-                                       font=("Arial", 12, "bold"), bg="#4CAF50", fg="white",
-                                       activebackground="#45a049", activeforeground="white", relief=tk.RAISED, bd=3)
-        self.rename_button.grid(row=2, column=0, columnspan=3, pady=15)
+        # --- Action Buttons Frame ---
+        self.action_buttons_frame = tk.Frame(self.controls_frame)
+        self.action_buttons_frame.grid(row=2, column=0, columnspan=4, pady=15) # Use columnspan 4 to center buttons
+
+        # "Start Renaming" Button - Themed
+        self.rename_button = tk.Button(self.action_buttons_frame, text="Start Renaming", command=self.start_renaming,
+                                       font=("Arial", 12, "bold"),
+                                       bg="#2E8B57", fg="white", # Sea Green
+                                       activebackground="#226B42", activeforeground="white", # Darker Sea Green
+                                       relief=tk.FLAT, bd=0, highlightthickness=1, highlightbackground="#1C5533", # Flat with border
+                                       padx=20, pady=10, cursor="hand2")
+        self.rename_button.pack(side=tk.LEFT, padx=10) # Pack to the left within its frame
+
+        # "Scramble Names" Button - Themed
+        self.scramble_button = tk.Button(self.action_buttons_frame, text="Scramble Names", command=self.start_scrambling,
+                                         font=("Arial", 12, "bold"),
+                                         bg="#FFA500", fg="black", # Orange
+                                         activebackground="#CC8400", activeforeground="black", # Darker Orange
+                                         relief=tk.FLAT, bd=0, highlightthickness=1, highlightbackground="#CC8400", # Flat with border
+                                         padx=20, pady=10, cursor="hand2")
+        self.scramble_button.pack(side=tk.LEFT, padx=10) # Pack to the left, next to the rename button
 
 
         # --- 3. Log Window ---
@@ -187,6 +206,7 @@ class RenamerApp:
             logging.error(f"Renaming aborted: Invalid directory path '{path}'.")
             return
 
+        logging.info("*"*30)
         logging.info(f"Starting renaming process for path: '{path}' and media type: '{media}'")
 
         try:
@@ -222,7 +242,7 @@ class RenamerApp:
 
             # 3. Determine starting point for string files
             starting_point_for_strings = max_existing_number + 1
-            logging.info(f"Starting point for renaming string files: {starting_point_for_strings}")
+            logging.debug(f"Starting point for renaming string files: {starting_point_for_strings}")
 
             # 4. Process string files
             if not strings_df.empty:
@@ -246,7 +266,7 @@ class RenamerApp:
             # Sort final DataFrame by 'New names'
             if not final_df.empty:
                 final_df = final_df.sort_values(by='New names', ascending=True, ignore_index=True)
-            
+
             logging.debug("\n--- Final Renaming Plan ---")
             if not final_df.empty:
                 logging.debug(final_df.to_string())
@@ -258,6 +278,7 @@ class RenamerApp:
                 renamingFiles(final_df, path)
                 messagebox.showinfo("Success", "Media renaming process completed!")
                 logging.info("Media renaming process completed successfully.")
+                logging.info("*"*30)
             else:
                 messagebox.showinfo("Info", "No files were found or needed renaming.")
                 logging.info("No files were found or needed renaming.")
@@ -265,4 +286,46 @@ class RenamerApp:
         except Exception as e:
             messagebox.showerror("Error", f"An unexpected error occurred: {e}")
             logging.exception("An unexpected error occurred during renaming process.") # Logs traceback
+
+    def start_scrambling(self):
+        """
+        Initiates the media scrambling process based on user inputs.
+        This function calls the core logic from scripts.scrambled_names.
+        """
+        path = self.directory_path.get()
+        media = self.media_type.get() # This will be 'images' or 'videos'
+
+        if not path:
+            messagebox.showerror("Input Error", "Please select a directory first.")
+            logging.error("Scrambling aborted: No directory selected.")
+            return
+
+        if not os.path.isdir(path):
+            messagebox.showerror("Input Error", f"The selected path '{path}' is not a valid directory.")
+            logging.error(f"Scrambling aborted: Invalid directory path '{path}'.")
+            return
+
+        # Convert 'images' to 'image' and 'videos' to 'video' for scramble_media_names
+        # which expects 'image' or 'video'
+        scramble_media_type = ''
+        if media == AppVariables.MEDIA_TYPE_IMAGES:
+            scramble_media_type = 'image'
+        elif media == AppVariables.MEDIA_TYPE_VIDEOS:
+            scramble_media_type = 'video'
+        else:
+            messagebox.showerror("Input Error", "Invalid media type selected for scrambling.")
+            logging.error(f"Scrambling aborted: Invalid media type '{media}'.")
+            return
+
+        logging.info("*"*30)
+        logging.info(f"Starting scrambling process for path: '{path}' and media type: '{scramble_media_type}'")
+
+        try:
+            scramble_media_names(path, scramble_media_type)
+            messagebox.showinfo("Success", "Media scrambling process completed!")
+            logging.info("Media scrambling process completed successfully.")
+            logging.info("*"*30)
+        except Exception as e:
+            messagebox.showerror("Error", f"An unexpected error occurred during scrambling: {e}")
+            logging.exception("An unexpected error occurred during scrambling process.") # Logs traceback
 

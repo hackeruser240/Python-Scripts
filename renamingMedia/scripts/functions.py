@@ -214,10 +214,10 @@ def renamingStrings(strings_df: pd.DataFrame, starting_point_for_strings: int) -
             strings_df.loc[i, 'New names'] = starting_point_for_strings + i
 
         strings_df['New names'] = strings_df['New names'].astype("Int64") # Use Int64 for nullable integer
-        logger.info("="*40)
-        logger.info("Strings DataFrame after assigning new names:")
-        logger.info(strings_df.head())
-        logger.info("="*40)
+        logger.debug("="*40)
+        logger.debug("Strings DataFrame after assigning new names:")
+        logger.debug(strings_df.head())
+        logger.debug("="*40)
         return strings_df
     except Exception as e:
         logger.error(f"Error in renamingStrings function: {e}")

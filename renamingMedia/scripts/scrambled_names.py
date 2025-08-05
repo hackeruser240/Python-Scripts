@@ -5,19 +5,11 @@ import string
 import logging
 import sys
 
-def loggerSetup():
-    logger=logging.getLogger(__name__)
-    logger.setLevel(logging.INFO)
-    formatter= logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%d-%b-%Y %I:%M %p')
+# Initialize logger for this module
+logger = logging.getLogger(__name__)
 
-    stream_handler=logging.StreamHandler(sys.stdout)
-    stream_handler.setLevel(logging.DEBUG)
-    stream_handler.setFormatter(formatter)
-
-    logger.addHandler(stream_handler)
-    
-    return logger
-
+# No need for setup_standalone_logger or setup_module_logger here
+# as logging will be configured by the main application (gui_app.py)
 
 def generate_random_name(length=15):
     """Generates a random alphanumeric string of a specified length."""
@@ -32,11 +24,11 @@ def scramble_media_names(path, media_type):
         path (str): The directory path containing the media files.
         media_type (str): The type of media to scramble ('image' or 'video').
     """
-
-    logger.info("Starting to scramble names")
+    logger.info("Starting to scramble names...")
     # Define common extensions for images and videos
-    image_extensions = ('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.webp')
-    video_extensions = ('.mp4', '.avi', '.mov', '.wmv', '.flv', '.mkv', '.webm')
+    # These should ideally come from a centralized config like AppVariables
+    image_extensions = ('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.webp', '.heic', '.jfif')
+    video_extensions = ('.mp4', '.avi', '.mov', '.wmv', '.flv', '.mkv', '.webm', '.mpeg')
 
     if media_type == 'image':
         extensions_to_scramble = image_extensions
@@ -47,7 +39,7 @@ def scramble_media_names(path, media_type):
         return
 
     if not os.path.isdir(path):
-        print(f"Error: The provided path '{path}' is not a valid directory.")
+        logger.error(f"Error: The provided path '{path}' is not a valid directory.")
         return
 
     scrambled_count = 0
@@ -75,15 +67,33 @@ def scramble_media_names(path, media_type):
 
             try:
                 os.rename(file_path, new_file_path)
-                logger.debug(f"Renamed '{filename}' to '{new_filename}'")
+                logger.debug(f"Renamed '{filename}' to '{new_filename}'") # DEBUG messages
                 scrambled_count += 1
             except OSError as e:
-                logger.info(f"Error renaming '{filename}': {e}")
+                logger.info(f"Error renaming '{filename}': {e}") # INFO for errors during renaming
 
-    logger.info(f"\nFinished scrambling. Total {scrambled_count} {media_type} files scrambled.")
+    logger.info(f"Finished scrambling. Total {scrambled_count} {media_type} files scrambled.")
 
 if __name__ == "__main__":
-    logger=loggerSetup()
+    # This block is for standalone execution of scrambled_names.py
+    # If run via the GUI, this block will not be executed.
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%d-%b-%Y %I:%M %p')
+
+    # Console handler for standalone INFO output
+    stream_handler = logging.StreamHandler(sys.stdout)
+    stream_handler.setLevel(logging.INFO)
+    stream_handler.setFormatter(formatter)
+    root_logger.addHandler(stream_handler)
+
+    # File handler for standalone DEBUG output
+    file_handler = logging.FileHandler('scramble_standalone_log.txt', mode='a')
+    file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(formatter)
+    root_logger.addHandler(file_handler)
+
+    logger.info("Running scrambled_names.py in standalone mode.")
 
     parser = argparse.ArgumentParser(
         description="Scramble (rename) image or video files in a specified directory to random alphanumeric names."
@@ -103,3 +113,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     scramble_media_names(args.path, args.media_type)
+
