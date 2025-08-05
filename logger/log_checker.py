@@ -28,6 +28,15 @@ def setup_logger():
     logger = logging.getLogger(__name__)
     return logger
 
+def calculate_something(x, y):
+        logger.debug(f"Calculating the sum of {x} and {y}.")
+        if y == 0:
+            logger.error("Cannot divide by zero.")
+            return None
+        result = x + y
+        logger.debug(f"The result is {result}.")
+        return result
+
 if __name__ == "__main__":
     logger = setup_logger()
     
@@ -36,15 +45,6 @@ if __name__ == "__main__":
     logger.warning("This is a warning message.")
     logger.error("This is an error message.")
     logger.critical("This is a critical message.")
-
-    def calculate_something(x, y):
-        logger.debug(f"Calculating the sum of {x} and {y}.")
-        if y == 0:
-            logger.error("Cannot divide by zero.")
-            return None
-        result = x + y
-        logger.debug(f"The result is {result}.")
-        return result
 
     calculate_something(10, 5)
     calculate_something(10, 0)
