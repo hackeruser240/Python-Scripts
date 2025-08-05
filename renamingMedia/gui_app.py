@@ -26,7 +26,7 @@ class TextWidgetHandler(logging.Handler):
     def __init__(self, text_widget):
         super().__init__()
         self.text_widget = text_widget
-        self.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+        self.setFormatter(logging.Formatter('%(message)s'))
 
     def emit(self, record):
         """
