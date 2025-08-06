@@ -1,12 +1,14 @@
 #main folder
 python-env/
-anconda_projects/db/
+anaconda_projects/db/
 .ipynb_checkpoints/
 
 #renamingMedia folder
 renamingMedia/scripts/__pycache__
 renamingMedia/scripts/log.txt
 renamingMedia/__pycache__
+renamingMedia/build
+renamingMedia/dist
 
 #transitionCode folder
 transitionCode/scripts/__pycache__
