@@ -1,19 +1,40 @@
+import os
 from main import combined,custom_folder_make
 from tkinter import messagebox
 import tkinter as tk
 
 def on_button_click():
-    dst_path=custom_folder_make(
-        folder_name=folder_name.get()
-    )
+    button.config(state="disabled")
 
-    combined(
-        template_path = template_entry.get(),
-        dst_path=dst_path
-    )
+    try:
+        # Get user inputs
+        folder = folder_name.get().strip()
+        template = template_entry.get().strip()
+        job_dir = job_folder.get().strip()
 
-    messagebox.showinfo("Folder Created", f'"{folder_name.get()}" has been created!')
+        # Validate inputs
+        if not folder:
+            messagebox.showerror("Input Error", "Folder/Company name is required.")
+            return
+        if not os.path.exists(template):
+            messagebox.showerror("File Error", f"Template file not found:\n{template}")
+            return
+        if not os.path.exists(job_dir):
+            messagebox.showerror("Directory Error", f"Job folder path does not exist:\n{job_dir}")
+            return
 
+        # Create folder and deploy template
+        dst_path = custom_folder_make(folder_name=folder)
+        combined(template_path=template, dst_path=dst_path)
+
+        # Success message
+        messagebox.showinfo("Success", f'"{folder}" has been created successfully!')
+
+    except Exception as e:
+        messagebox.showerror("Unexpected Error", f"Something went wrong while executing GUI:\n{str(e)}")
+
+    finally:
+        button.config(state="normal")
 
 # Create main window
 root = tk.Tk()
