@@ -19,3 +19,10 @@ transitionCode/__pycache__
 #logger directory
 __pycache__/
 logger/logs/log.txt
+
+#latex_cv_template
+latex_cv_template/__pycache__/
+latex_cv_template/dist/
+latex_cv_template/build/
+latex_cv_template/*.spec
+latex_cv_template/src/*.txt
