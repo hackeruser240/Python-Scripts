@@ -2,6 +2,7 @@
 python-env/
 anaconda_projects/db/
 .ipynb_checkpoints/
+prompts/
 
 #renamingMedia folder
 renamingMedia/scripts/__pycache__
@@ -26,3 +27,7 @@ latex_cv_template/dist/
 latex_cv_template/build/
 latex_cv_template/*.spec
 latex_cv_template/src/*.txt
+
+#image_sorting:
+image_sorting/__pycache__/
+image_sorting/*.txt
