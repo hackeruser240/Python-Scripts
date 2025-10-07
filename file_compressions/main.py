@@ -3,7 +3,7 @@ import subprocess
 import time
 from tqdm import tqdm
 
-BASE_DIR = r"E:\Images\0\EME College"
+BASE_DIR = r"E:\Images\0"
 
 def list_folders(directory):
     return [f for f in os.listdir(directory) if os.path.isdir(os.path.join(directory, f))]
