@@ -21,6 +21,7 @@ Dependencies:
 import os
 import shutil
 import argparse
+from image_sorting.loggers.LOCAL_loggerSetup import local_loggerSetup
 
 MONTH_MAP = {
     "Jan": "January", "Feb": "February", "Mar": "March", "Apr": "April",
@@ -54,10 +55,10 @@ def move_folder_to_month(folder_name, base_dir):
     try:
         os.makedirs(dest_dir, exist_ok=True)
         shutil.move(src_path, dest_path)
-        print(f"✅ Moved: {folder_name} → {month_full}")
+        logger.info(f"✅ Moved: {folder_name} → {month_full}")
         return True
     except Exception as e:
-        print(f"⚠️ Error moving {folder_name}: {e}")
+        logger.error(f"⚠️ Error moving {folder_name}: {e}")
         return False
 
 def rename_month_folders(base_dir):
@@ -90,18 +91,18 @@ def rename_month_folders(base_dir):
                         dest_item = os.path.join(new_path, item)
 
                         if os.path.exists(dest_item):
-                            print(f"⚠️ Skipped: {dest_item} already exists")
+                            logger.info(f"⚠️ Skipped: {dest_item} already exists")
                         else:
                             shutil.move(src_item, new_path)
 
                     os.rmdir(old_path)
-                    print(f"🔄 Merged into existing: {new_path}")
+                    logger.info(f"🔄 Merged into existing: {new_path}")
 
                 else:
                     os.rename(old_path, new_path)
-                    print(f"Renamed: {month_name} → {new_name}")
+                    logger.info(f"Renamed: {month_name} → {new_name}")
             except Exception as e:
-                print(f"⚠️ Error renaming {month_name}: {e}")
+                logger.error(f"⚠️ Error renaming {month_name}: {e}")
 
 def folders_already_renamed(base_dir):
     """Check if month folders are correctly renamed in calendar order."""
@@ -139,7 +140,9 @@ if __name__ == "__main__":
     parser.add_argument('--source', type=str, help='Base directory to organize', required=True)
     args = parser.parse_args()
 
+    logger=local_loggerSetup("monthOrganizer.py")
+    logger.info(f"Script started with source: {args.source}")
     if args.source:
         organize_folders_by_month(args.source)
     else:
-        print("Please provide a valid source directory using --source")
+        logger.info("Please provide a valid source directory using --source")

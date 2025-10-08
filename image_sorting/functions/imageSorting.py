@@ -7,6 +7,7 @@ from datetime import datetime
 from PIL import Image
 from PIL.ExifTags import TAGS
 import exifread
+from image_sorting.loggers.LOCAL_loggerSetup import local_loggerSetup
 
 IMAGE_EXTENSIONS = ('.jpg', '.jpeg', '.png')
 VIDEO_EXTENSIONS = ('.mp4', '.mkv', '.mov', '.avi', '.m4a', '.webm')
@@ -93,7 +94,7 @@ def get_file_creation_date(filepath):
     if valid_dates:
         return min(valid_dates)
 
-    print(f"⚠️ Fallback used for: {os.path.basename(filepath)}")
+    logger.info(f"⚠️ Fallback used for: {os.path.basename(filepath)}")
     return None
 
 def build_destination_path(base_dir, date_obj):
@@ -110,15 +111,18 @@ def copy_and_move_to_raw(src_path, dest_folder):
     raw_folder = os.path.join(os.path.dirname(src_path), "Raw")
     os.makedirs(raw_folder, exist_ok=True)
     moved_path = os.path.join(raw_folder, os.path.basename(src_path))
-    shutil.move(src_path, moved_path)
+    #shutil.move(src_path, moved_path)
 
-    print(f"Copied → {copied_path}")
-    print(f"Moved to Raw → {moved_path}")
+    logger.info(f"Copied → {copied_path}")
+    logger.info(f"Moved to Raw → {moved_path}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Sort images and videos by earliest creation date.")
     parser.add_argument('--source', type=str, required=True, help='Source directory of media files')
     args = parser.parse_args()
+
+    logger=local_loggerSetup("imageSorting.py")
+    logger.info(f"Script started with source: {args.source}")
 
     SOURCE_DIR = args.source
     SENT_SOURCE_DIR = os.path.join(SOURCE_DIR, "Sent")
@@ -138,4 +142,4 @@ if __name__ == "__main__":
                 destination_folder = build_destination_path(directory, creation_date)
                 copy_and_move_to_raw(full_path, destination_folder)
             else:
-                print(f"Skipped (no date found): {filename}")
+                logger.info(f"Skipped (no date found): {filename}")
