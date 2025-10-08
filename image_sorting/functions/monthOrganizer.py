@@ -83,10 +83,47 @@ def rename_month_folders(base_dir):
         new_path = os.path.join(base_dir, new_name)
         if old_path != new_path:
             try:
-                os.rename(old_path, new_path)
-                print(f"🔄 Renamed: {month_name} → {new_name}")
+                if os.path.exists(new_path):
+                    # Merge contents from old_path into new_path
+                    for item in os.listdir(old_path):
+                        src_item = os.path.join(old_path, item)
+                        dest_item = os.path.join(new_path, item)
+
+                        if os.path.exists(dest_item):
+                            print(f"⚠️ Skipped: {dest_item} already exists")
+                        else:
+                            shutil.move(src_item, new_path)
+
+                    os.rmdir(old_path)
+                    print(f"🔄 Merged into existing: {new_path}")
+
+                else:
+                    os.rename(old_path, new_path)
+                    print(f"Renamed: {month_name} → {new_name}")
             except Exception as e:
                 print(f"⚠️ Error renaming {month_name}: {e}")
+
+def folders_already_renamed(base_dir):
+    """Check if month folders are correctly renamed in calendar order."""
+    MONTH_ORDER = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ]
+
+    actual = []
+    for folder_name in os.listdir(base_dir):
+        folder_path = os.path.join(base_dir, folder_name)
+        if not os.path.isdir(folder_path):
+            continue
+
+        parts = folder_name.split(" ", 1)
+        if len(parts) == 2 and parts[0].isdigit() and parts[1] in MONTH_ORDER:
+            actual.append((int(parts[0]), parts[1]))
+
+    actual.sort()
+    expected = [(i, MONTH_ORDER[i]) for i in range(len(actual))]
+
+    return actual == expected
 
 def organize_folders_by_month(base_dir):
     """Scan base directory and organize folders by month."""
@@ -95,7 +132,6 @@ def organize_folders_by_month(base_dir):
         if not os.path.isdir(folder_path):
             continue
         move_folder_to_month(folder_name, base_dir)
-
     rename_month_folders(base_dir)
 
 if __name__ == "__main__":
