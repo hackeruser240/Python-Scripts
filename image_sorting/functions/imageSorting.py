@@ -9,6 +9,7 @@ from PIL.ExifTags import TAGS
 import exifread
 from image_sorting.loggers.LOCAL_loggerSetup import local_loggerSetup
 
+logger=local_loggerSetup("imageSorting.py")
 IMAGE_EXTENSIONS = ('.jpg', '.jpeg', '.png')
 VIDEO_EXTENSIONS = ('.mp4', '.mkv', '.mov', '.avi', '.m4a', '.webm')
 SUPPORTED_EXTENSIONS = IMAGE_EXTENSIONS + VIDEO_EXTENSIONS

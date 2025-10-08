@@ -1,6 +1,7 @@
 import shutil, os
-from functions.imageSorting import *
-from functions.monthOrganizer import organize_folders_by_month
+from image_sorting.functions.imageSorting import *
+from image_sorting.functions.monthOrganizer import organize_folders_by_month
+from image_sorting.loggers.APP_loggerSetup import app_loggerSetup
 
 def snapchat():
     SRC = r"E:\Phone Backups\Snapchat"
@@ -8,11 +9,11 @@ def snapchat():
 
     if os.path.exists( os.path.join(DST, "2024") ):
         shutil.rmtree( os.path.join(DST, "2024") )
-        print(f"Deleted existing folder: {os.path.join(DST, '2024')}")
+        logger.info(f"Deleted existing folder: {os.path.join(DST, '2024')}")
             
     if os.path.exists( os.path.join(DST, "2025") ):
         shutil.rmtree( os.path.join(DST, "2025") )
-        print(f"Deleted existing folder: {os.path.join(DST, '2025')}")
+        logger.info(f"Deleted existing folder: {os.path.join(DST, '2025')}")
 
     # Copy the backup
     if os.path.isdir(SRC):
@@ -24,10 +25,10 @@ def snapchat():
                 shutil.copytree(src_item, dst_item, dirs_exist_ok=True)
             else:
                 shutil.copy2(src_item, dst_item)
-                print(f"Copied file: {src_item} to {dst_item}")
-        print("Snapchat copied successfully.")
+                logger.info(f"Copied file: {src_item} to {dst_item}")
+        logger.info("Snapchat copied successfully.")
     else:
-        print(f"Source folder not found: {SRC}")
+        logger.info(f"Source folder not found: {SRC}")
 
     #imageSorting()
     IMAGE_EXTENSIONS = ('.jpg', '.jpeg', '.png')
@@ -46,13 +47,16 @@ def snapchat():
             destination_folder = build_destination_path(DST, creation_date)
             copy_and_move_to_raw(full_path, destination_folder)
         else:
-            print(f"Skipped (no date found): {filename}")
+            logger.info(f"Skipped (no date found): {filename}")
 
     #monthOrganizer()
-    DST=os.path.join(DST, "2025")
-    organize_folders_by_month(DST)
-    DST=os.path.join(DST, "2024")
-    organize_folders_by_month(DST)
+    dst=os.path.join(DST, "2025")
+    organize_folders_by_month(dst)
+
+    dst=os.path.join(DST, "2024")
+    organize_folders_by_month(dst)
 
 if __name__ == "__main__":
+    logger=app_loggerSetup()
+    logger.info("App started")
     snapchat()

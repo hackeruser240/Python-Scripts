@@ -31,3 +31,4 @@ latex_cv_template/src/*.txt
 #image_sorting:
 image_sorting/__pycache__/
 image_sorting/*.txt
+image_sorting/loggers/logs/

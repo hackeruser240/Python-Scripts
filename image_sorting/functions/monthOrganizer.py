@@ -22,6 +22,7 @@ import os
 import shutil
 import argparse
 from image_sorting.loggers.LOCAL_loggerSetup import local_loggerSetup
+logger=local_loggerSetup("monthOrganizer.py")
 
 MONTH_MAP = {
     "Jan": "January", "Feb": "February", "Mar": "March", "Apr": "April",
