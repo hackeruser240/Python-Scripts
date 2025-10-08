@@ -62,6 +62,11 @@ def get_filesystem_dates(filepath):
     except Exception:
         return []
 
+def normalize_datetime(dt):
+    if dt.tzinfo is not None:
+        return dt.astimezone(tz=None).replace(tzinfo=None)
+    return dt
+
 def get_file_creation_date(filepath):
     dates = []
 
@@ -84,7 +89,7 @@ def get_file_creation_date(filepath):
     fs_dates = get_filesystem_dates(filepath)
     dates.extend(fs_dates)
 
-    valid_dates = [d for d in dates if d is not None]
+    valid_dates = [normalize_datetime(d) for d in dates if d is not None]
     if valid_dates:
         return min(valid_dates)
 
@@ -105,7 +110,7 @@ def copy_and_move_to_raw(src_path, dest_folder):
     raw_folder = os.path.join(os.path.dirname(src_path), "Raw")
     os.makedirs(raw_folder, exist_ok=True)
     moved_path = os.path.join(raw_folder, os.path.basename(src_path))
-    # shutil.move(src_path, moved_path)
+    shutil.move(src_path, moved_path)
 
     print(f"Copied → {copied_path}")
     print(f"Moved to Raw → {moved_path}")
