@@ -1,0 +1,88 @@
+"""
+Script Name: month_folder_organizer.py
+Purpose:
+    Organize folders named like '01-Jan-2025' into their respective month folders
+    inside a given base directory. For example, '01-Jan-2025' → 'January/01-Jan-2025'.
+
+Behavior:
+    - Scans the base directory for folders matching the pattern 'DD-MMM-YYYY'
+    - Extracts the month abbreviation (e.g., 'Jan') and maps it to full month name
+    - Moves each folder into its corresponding month folder (e.g., 'January')
+
+Usage:
+    - Set BASE_DIR to the target directory containing date-named folders
+    - Run the script directly; no arguments required
+
+Dependencies:
+    - Standard Python libraries only (os, shutil)
+
+Example Folder Structure Before:
+    r"E:/Images/Dumps/2025/2025"
+        ├── 01-Jan-2025
+        ├── 01-Feb-2025
+        ├── 01-Mar-2025
+
+Example Folder Structure After:
+    r"E:/Images/Dumps/2025/2025"
+        ├── January/
+        │     └── 01-Jan-2025
+        ├── February/
+        │     └── 01-Feb-2025
+        ├── March/
+              └── 01-Mar-2025
+"""
+
+
+import os
+import shutil
+import argparse
+
+# === CONFIG ===
+#BASE_DIR = r"E:\Images\Dumps\2025\2025"
+MONTH_MAP = {
+    "Jan": "January", "Feb": "February", "Mar": "March", "Apr": "April",
+    "May": "May", "Jun": "June", "Jul": "July", "Aug": "August",
+    "Sep": "September", "Oct": "October", "Nov": "November", "Dec": "December"
+}
+
+def get_month_folder_name(folder_name):
+    """Extract month abbreviation and return full month name."""
+    parts = folder_name.split("-")
+    if len(parts) != 3:
+        return None
+    month_abbr = parts[1]
+    return MONTH_MAP.get(month_abbr)
+
+def move_folder_to_month(folder_name, BASE_DIR):
+    """Move folder into its respective month folder."""
+    month_full = get_month_folder_name(folder_name)
+    if not month_full:
+        return False
+
+    src_path = os.path.join(BASE_DIR, folder_name)
+    dest_dir = os.path.join(BASE_DIR, month_full)
+    dest_path = os.path.join(dest_dir, folder_name)
+
+    try:
+        os.makedirs(dest_dir, exist_ok=True)
+        shutil.move(src_path, dest_path)
+        print(f"✅ Moved: {folder_name} → {month_full}")
+        return True
+    except Exception as e:
+        print(f"⚠️ Error moving {folder_name}: {e}")
+        return False
+
+def organize_folders_by_month(base_dir):
+    """Scan base directory and organize folders by month."""
+    for folder_name in os.listdir(base_dir):
+        folder_path = os.path.join(base_dir, folder_name)
+        if not os.path.isdir(folder_path):
+            continue
+        move_folder_to_month(folder_name,base_dir)
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Organize folders by month.")
+    parser.add_argument('--source', type=str, help='Base directory to organize', required=True)
+    args = parser.parse_args()
+
+    organize_folders_by_month(args.source)
