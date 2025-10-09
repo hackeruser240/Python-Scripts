@@ -1,7 +1,8 @@
 # filename: download_it_videos.py
 import subprocess
 import os
-from urllib.parse import urlparse, parse_qs
+from urllib.parse import urlparse
+import argparse
 
 
 def ensure_output_folder(path):
@@ -46,8 +47,8 @@ def download_video(link, output_folder):
         return False
 
 
-def main():
-    input_file = r"C:\Users\HP\Downloads\it_links.txt" # Adjusted file name
+def main(input_file):
+    #input_file = r"C:\Users\HP\Downloads\it_links.txt" # Adjusted file name
     output_folder = r"C:\Users\HP\Downloads\it_videos" # Adjusted folder name
 
     ensure_output_folder(output_folder)
@@ -79,4 +80,13 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    #main()
+    parser = argparse.ArgumentParser(description="Download Instagram videos from links in a text file.")
+    parser.add_argument("--input_file", help="Path to the input text file containing Instagram video links.")
+    args = parser.parse_args()
+
+    if args.input_file:
+        main(args.input_file)
+    else:
+        input_file = r"C:\Users\HP\Downloads\it_links.txt" # Adjusted file name
+        main(input_file)
