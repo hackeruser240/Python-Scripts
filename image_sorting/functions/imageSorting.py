@@ -112,7 +112,7 @@ def copy_and_move_to_raw(src_path, dest_folder):
     raw_folder = os.path.join(os.path.dirname(src_path), "Raw")
     os.makedirs(raw_folder, exist_ok=True)
     moved_path = os.path.join(raw_folder, os.path.basename(src_path))
-    #shutil.move(src_path, moved_path)
+    shutil.move(src_path, moved_path)
 
     logger.info(f"Copied → {copied_path}")
     logger.info(f"Moved to Raw → {moved_path}")
