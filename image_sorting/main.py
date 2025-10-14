@@ -73,6 +73,8 @@ def whatsapp():
     if os.path.isdir(SRC):
         os.makedirs(DST, exist_ok=True)
         for item in os.listdir(SRC):
+            if item == ".stfolder":
+                continue  # Skip the .stfolder directory
             src_item = os.path.join(SRC, item)
             dst_item = os.path.join(DST, item)
             if os.path.isdir(src_item):
@@ -113,15 +115,15 @@ def whatsapp():
 def whatsapp_SENT():
     
     SRC = r"E:\Images\WhatsApp dumps\2025\Sent"
-    DST = r"E:\Images\WhatsApp dumps\2025"
+    #DST = r"E:\Images\WhatsApp dumps\2025"
 
-    if os.path.exists( os.path.join(DST, "2024") ):
-        shutil.rmtree( os.path.join(DST, "2024") )
-        logger.info(f"Deleted existing folder: {os.path.join(DST, '2024')}")
+    if os.path.exists( os.path.join(SRC, "2024") ):
+        shutil.rmtree( os.path.join(SRC, "2024") )
+        logger.info(f"Deleted existing folder: {os.path.join(SRC, '2024')}")
             
-    if os.path.exists( os.path.join(DST, "2025") ):
-        shutil.rmtree( os.path.join(DST, "2025") )
-        logger.info(f"Deleted existing folder: {os.path.join(DST, '2025')}")
+    if os.path.exists( os.path.join(SRC, "2025") ):
+        shutil.rmtree( os.path.join(SRC, "2025") )
+        logger.info(f"Deleted existing folder: {os.path.join(SRC, '2025')}")
 
     #imageSorting()
     IMAGE_EXTENSIONS = ('.jpg', '.jpeg', '.png')
@@ -206,7 +208,7 @@ if __name__ == "__main__":
     logger=app_loggerSetup()
     logger.info("App started")
     
-    #snapchat()
-    #whatsapp()
-    whatsapp_SENT()  # For WhatsApp Sent folder
-    #photograph_edits()
+    snapchat()
+    whatsapp()
+    whatsapp_SENT()
+    photograph_edits()
