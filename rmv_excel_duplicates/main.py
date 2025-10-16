@@ -1,0 +1,59 @@
+
+import pandas as pd
+import csv
+from collections import defaultdict
+
+def remove_duplicates(input_file):
+    # Read all email rows (no header expected)
+    with open(input_file, mode='r', newline='', encoding='utf-8') as f:
+        reader = csv.reader(f)
+        email_rows = [row[0].strip() for row in reader if row]
+
+    seen = set()
+    duplicates = defaultdict(list)
+    deduplicated_rows = []
+
+    for email in email_rows:
+        if email not in seen:
+            seen.add(email)
+            deduplicated_rows.append([email])
+        else:
+            duplicates[email].append(email)
+
+    # Display duplicates
+    if duplicates:
+        print("Duplicate emails found (excluding first occurrence):")
+        for email, entries in duplicates.items():
+            print(f"{email} ({len(entries)} duplicates)")
+    else:
+        print("No duplicates found.")
+
+    # Save deduplicated emails to new file
+    output_file = input_file.replace('.csv', '_deduplicated.csv')
+    with open(output_file, mode='w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerows(deduplicated_rows)
+
+    print(f"Deduplicated file saved as: {output_file}")
+
+def sort_emails_by_local_part(output_file):
+    # Read deduplicated emails
+    with open(output_file, mode='r', newline='', encoding='utf-8') as f:
+        reader = csv.reader(f)
+        email_rows = [row[0].strip() for row in reader if row]
+
+    # Sort by local part (before '@')
+    sorted_rows = sorted(email_rows, key=lambda email: email.split('@')[0])
+
+    # Overwrite the file with sorted emails
+    with open(output_file, mode='w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        for email in sorted_rows:
+            writer.writerow([email])
+
+    print(f"Sorted emails saved in: {output_file}")
+
+if __name__ == "__main__":
+    output_file = r"emails.csv"
+    remove_duplicates(output_file)
+    sort_emails_by_local_part(output_file.replace('.csv', '_deduplicated.csv'))
