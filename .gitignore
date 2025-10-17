@@ -32,3 +32,9 @@ latex_cv_template/src/*.txt
 image_sorting/__pycache__/
 image_sorting/*.txt
 image_sorting/loggers/logs/
+
+#rmv_excel_duplicates:
+rmv_excel_duplicates/*.csv
+rmv_excel_duplicates/*.xlsx
+rmv_excel_duplicates/*.txt
+rmv_excel_duplicates/*.log
