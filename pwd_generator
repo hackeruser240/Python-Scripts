@@ -1,0 +1,28 @@
+import random
+import string
+
+def get_user_input():
+    """Prompt the user for password length and validate input."""
+    try:
+        length = int(input("Enter the number of characters for the password: "))
+        if length <= 0:
+            raise ValueError("Length must be greater than 0.")
+        return length
+    except ValueError as e:
+        print(f"Invalid input: {e}")
+        return None
+
+def generate_password(length):
+    """Generate a password with letters, digits, and symbols."""
+    characters = string.ascii_letters + string.digits + string.punctuation
+    return ''.join(random.choices(characters, k=length))
+
+def main():
+    """Main function to orchestrate password generation."""
+    length = get_user_input()
+    if length:
+        password = generate_password(length)
+        print("Generated password:\n\n",password)
+
+if __name__ == "__main__":
+    main()
