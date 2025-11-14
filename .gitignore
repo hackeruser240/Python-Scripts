@@ -38,3 +38,10 @@ rmv_excel_duplicates/*.csv
 rmv_excel_duplicates/*.xlsx
 rmv_excel_duplicates/*.txt
 rmv_excel_duplicates/*.log
+
+
+#instagram shorts:
+instagram_shorts/__pycache__/
+instagram_shorts/*.txt
+instagram_shorts/scripts/*.txt
+instagram_shorts/Data
